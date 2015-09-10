@@ -66,13 +66,6 @@
 						</lifecycleMappingMetadata>
 					</configuration>
 				</plugin>
-				<plugin>
-					<groupId>org.jacoco</groupId>
-					<artifactId>jacoco-maven-plugin</artifactId>
-					<configuration>
-						<exclude>**/lib/*</exclude>
-					</configuration>					
-				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
