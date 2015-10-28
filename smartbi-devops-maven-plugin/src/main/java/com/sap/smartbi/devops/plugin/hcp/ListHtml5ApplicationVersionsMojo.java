@@ -58,7 +58,7 @@ public final class ListHtml5ApplicationVersionsMojo extends
 						String.format("\tversion: %1$s\n\tcommit ID: %2$s\n",
 								version.getVersion(), version.getCommitId()));
 			}
-		} catch (Throwable e) {
+		} catch (RuntimeException e) {
 			this.getLog().error(
 					"Failed to retrieve HTML5 application versions.");
 

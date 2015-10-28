@@ -1,6 +1,7 @@
 package com.sap.smartbi.devops.plugin.hcp;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -62,7 +63,19 @@ public final class ImportHtml5ApplicationContentMojo extends
 							.format("Successfully imported HTML5 application content\n\tname: %1$s\n\tversion: %2$s\n\tcontent source: %3$s\n",
 									this.name, this.version,
 									this.content.getAbsolutePath()));
-		} catch (Throwable e) {
+		} catch (RuntimeException e) {
+			this.getLog()
+					.error(String
+							.format("Failed to import HTML5 application content\n\tname: %1$s\n\tversion: %2$s\n\tcontent source: %3$s\n",
+									this.name, this.version,
+									this.content.getAbsolutePath()));
+
+			throw new MojoExecutionException(
+					String.format(
+							"An error occured while importing the \"%1$s\" HTML5 application content \"%2$s\" from content source \"%3$s\"",
+							this.name, this.version,
+							this.content.getAbsolutePath()), e);
+		} catch (IOException e) {
 			this.getLog()
 					.error(String
 							.format("Failed to import HTML5 application content\n\tname: %1$s\n\tversion: %2$s\n\tcontent source: %3$s\n",

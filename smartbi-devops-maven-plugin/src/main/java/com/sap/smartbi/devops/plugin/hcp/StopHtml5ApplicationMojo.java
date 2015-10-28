@@ -52,7 +52,7 @@ public final class StopHtml5ApplicationMojo extends
 							.format("Successfully stopped HTML5 application\n\tname: %1$s\n",
 									this.name));
 
-		} catch (Throwable e) {
+		} catch (RuntimeException e) {
 			this.getLog().error(
 					String.format(
 							"Failed to stop the \"%1$s\" HTML5 application.",

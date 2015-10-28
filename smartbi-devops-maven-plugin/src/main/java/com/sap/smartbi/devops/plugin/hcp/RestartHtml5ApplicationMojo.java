@@ -52,7 +52,7 @@ public final class RestartHtml5ApplicationMojo extends
 							.format("Successfully restarted HTML5 application\n\tname: %1$s\n",
 									this.name));
 
-		} catch (Throwable e) {
+		} catch (RuntimeException e) {
 			this.getLog()
 					.error(String
 							.format("Failed to restart the \"%1$s\" HTML5 application.",

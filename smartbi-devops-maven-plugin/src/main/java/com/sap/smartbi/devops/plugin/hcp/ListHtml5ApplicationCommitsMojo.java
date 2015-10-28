@@ -64,7 +64,7 @@ public final class ListHtml5ApplicationCommitsMojo extends
 										commit.getCommitter(),
 										commit.getIsActive()));
 			}
-		} catch (Throwable e) {
+		} catch (RuntimeException e) {
 			this.getLog()
 					.error("Failed to retrieve HTML5 application commits.");
 

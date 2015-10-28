@@ -52,7 +52,7 @@ public final class StartHtml5ApplicationMojo extends
 							.format("Successfully started HTML5 application\n\tname: %1$s\n",
 									this.name));
 
-		} catch (Throwable e) {
+		} catch (RuntimeException e) {
 			this.getLog().error(
 					String.format(
 							"Failed to start the \"%1$s\" HTML5 application.",

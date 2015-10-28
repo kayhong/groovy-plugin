@@ -60,7 +60,7 @@ public final class GetHtml5ApplicationMojo extends AbstractHtml5ApplicationMojo 
 									application.getActiveCommit(),
 									application.getStartedVersion(),
 									application.getStartedCommit()));
-		} catch (Throwable e) {
+		} catch (RuntimeException e) {
 			this.getLog()
 					.error(String
 							.format("Failed to retrieve the \"%1$s\" HTML5 application details.",

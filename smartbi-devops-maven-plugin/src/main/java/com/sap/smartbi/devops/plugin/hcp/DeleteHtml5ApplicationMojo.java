@@ -59,7 +59,7 @@ public final class DeleteHtml5ApplicationMojo extends
 					.info(String
 							.format("Successfully deleted the \"%1$s\" HTML5 application",
 									this.name));
-		} catch (Throwable e) {
+		} catch (RuntimeException e) {
 			this.getLog().error(
 					String.format(
 							"Failed to delete the \"%1$s\" HTML5 application.",

@@ -63,7 +63,7 @@ public final class ListHtml5ApplicationsMojo extends
 										application.getStartedVersion(),
 										application.getStartedCommit()));
 			}
-		} catch (Throwable e) {
+		} catch (RuntimeException e) {
 			this.getLog().error("Failed to retrieve HTML5 applications.");
 
 			throw new MojoExecutionException(

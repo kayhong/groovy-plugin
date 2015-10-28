@@ -55,7 +55,7 @@ public final class ActivateHtml5ApplicationVersionMojo extends
 							.format("Successfully activated HTML5 application version\n\tname: %1$s\n\tversion: %2$s\n",
 									this.name, this.version));
 
-		} catch (Throwable e) {
+		} catch (RuntimeException e) {
 			this.getLog()
 					.error(String
 							.format("Failed to activate the HTML5 application version\n\tname: %1$s\n\tversion: %2$s\n",

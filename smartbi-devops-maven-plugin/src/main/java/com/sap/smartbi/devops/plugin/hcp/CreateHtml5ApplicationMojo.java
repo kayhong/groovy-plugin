@@ -66,7 +66,7 @@ public final class CreateHtml5ApplicationMojo extends
 									application.getUrl(),
 									application.getRepository(),
 									application.getStatus()));
-		} catch (Throwable e) {
+		} catch (RuntimeException e) {
 			this.getLog().error(
 					String.format(
 							"Failed to create the \"%1$s\" HTML5 application.",
