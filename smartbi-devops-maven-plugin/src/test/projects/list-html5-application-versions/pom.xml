@@ -1,0 +1,28 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.sap.smartbi.devops</groupId>
+	<artifactId>get-html5-applications-test</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+
+	<packaging>pom</packaging>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.sap.smartbi.devops</groupId>
+				<artifactId>smartbi-devops-maven-plugin</artifactId>
+				<configuration>
+					<host>neo.ondemand.com</host>
+					<account>x389dec7d</account>
+					<userName>P1941054458</userName>
+					<password>Nett2014</password>
+					<proxyHost>proxy</proxyHost>
+					<proxyPort>8080</proxyPort>
+					<application>z666z</application>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

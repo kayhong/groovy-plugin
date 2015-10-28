@@ -1,0 +1,20 @@
+{
+    "authenticationMethod": "saml",
+    "welcomeFile": "index.html",
+    "sendWelcomeFileRedirect": true,
+    "securityConstraints": [
+        {
+            "permission": "AccessApplicationDescriptor",
+            "description": "Access application descriptor",
+            "protectedPaths": [
+                "/neo-app.json"
+            ]
+        }
+    ],
+    "cacheControl": [
+        {
+            "maxAge": 3600
+        }
+    ],
+    "headerWhiteList": []
+}
