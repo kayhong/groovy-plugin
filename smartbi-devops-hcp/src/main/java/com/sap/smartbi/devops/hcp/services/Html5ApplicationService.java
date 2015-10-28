@@ -219,7 +219,9 @@ public final class Html5ApplicationService {
 
 			return response.readEntity(Html5ApplicationImpl.class);
 		} finally {
-			response.close();
+			if (response != null) {
+				response.close();
+			}
 		}
 	}
 
