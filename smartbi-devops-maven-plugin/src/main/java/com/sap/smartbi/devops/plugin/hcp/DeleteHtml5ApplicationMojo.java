@@ -24,7 +24,7 @@ public final class DeleteHtml5ApplicationMojo extends
 	private String host;
 
 	@Parameter(property = APPLICATION_PROPERTY, required = true)
-	private String name;
+	private String application;
 
 	@Parameter(property = PASSWORD_PROPERTY)
 	private String password;
@@ -36,39 +36,39 @@ public final class DeleteHtml5ApplicationMojo extends
 	private int proxyPort;
 
 	@Parameter(property = USER_PROPERTY, required = true)
-	private String userName;
+	private String user;
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		Html5ApplicationService service = this.createHtml5ApplicationService(
-				this.host, this.account, this.userName, this.password,
+				this.host, this.account, this.user, this.password,
 				this.proxyHost, this.proxyPort);
 
 		this.getLog()
 				.info(String
 						.format("Deleting HTML5 application:\n\tapplication: %1$s\n\taccount: %2$s\n\thost: %3$s\n\tuser: %4$s\n\tdelete repository: %5$s\n\tdelete subscriptions: %6$s\n",
-								this.name, this.account, this.host,
-								this.userName, this.deleteRepository,
+								this.application, this.account, this.host,
+								this.user, this.deleteRepository,
 								this.deleteSubscriptions));
 
 		try {
-			service.deleteApplication(this.name, this.deleteRepository,
+			service.deleteApplication(this.application, this.deleteRepository,
 					this.deleteSubscriptions);
 
 			this.getLog()
 					.info(String
 							.format("Successfully deleted the \"%1$s\" HTML5 application",
-									this.name));
+									this.application));
 		} catch (RuntimeException e) {
 			this.getLog().error(
 					String.format(
 							"Failed to delete the \"%1$s\" HTML5 application.",
-							this.name));
+							this.application));
 
 			throw new MojoExecutionException(
 					String.format(
 							"An error occured while deleting the \"%1$s\" HTML5 application",
-							this.name), e);
+							this.application), e);
 		}
 	}
 
@@ -78,7 +78,7 @@ public final class DeleteHtml5ApplicationMojo extends
 	}
 
 	public void setApplication(final String application) {
-		this.name = application;
+		this.application = application;
 	}
 
 	public void setDeleteRepository(boolean deleteRepository) {
@@ -111,6 +111,6 @@ public final class DeleteHtml5ApplicationMojo extends
 
 	@Override
 	public void setUserName(String userName) {
-		this.userName = userName;
+		this.user = userName;
 	}
 }
