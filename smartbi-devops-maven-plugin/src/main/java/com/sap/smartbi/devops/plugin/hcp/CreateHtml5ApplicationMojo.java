@@ -15,6 +15,9 @@ public final class CreateHtml5ApplicationMojo extends
 	@Parameter(property = ACCOUNT_PROPERTY, required = true)
 	private String account;
 
+	@Parameter(property = APPLICATION_PROPERTY, required = true)
+	private String application;
+
 	@Parameter(property = CLOUD_REPOSITORY_PROPERTY, defaultValue = "true")
 	private boolean cloudRepository;
 
@@ -23,9 +26,6 @@ public final class CreateHtml5ApplicationMojo extends
 
 	@Parameter(property = HOST_PROPERTY, required = true)
 	private String host;
-
-	@Parameter(property = APPLICATION_PROPERTY, required = true)
-	private String application;
 
 	@Parameter(property = PASSWORD_PROPERTY)
 	private String password;
@@ -113,7 +113,7 @@ public final class CreateHtml5ApplicationMojo extends
 	}
 
 	@Override
-	public void setUserName(final String userName) {
+	public void setUser(final String userName) {
 		this.user = userName;
 	}
 }

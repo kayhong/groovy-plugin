@@ -30,18 +30,18 @@ public final class ListHtml5ApplicationsMojo extends
 	private int proxyPort;
 
 	@Parameter(property = USER_PROPERTY, required = true)
-	private String userName;
+	private String user;
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		Html5ApplicationService service = this.createHtml5ApplicationService(
-				this.host, this.account, this.userName, this.password,
+				this.host, this.account, this.user, this.password,
 				this.proxyHost, this.proxyPort);
 
 		this.getLog()
 				.info(String
 						.format("Retrieving HTML5 applications:\n\taccount: %1$s\n\thost: %2$s\n\tuser: %3$s\n",
-								this.account, this.host, this.userName));
+								this.account, this.host, this.user));
 
 		try {
 			Collection<Html5Application> applications = service
@@ -97,7 +97,7 @@ public final class ListHtml5ApplicationsMojo extends
 	}
 
 	@Override
-	public void setUserName(final String userName) {
-		this.userName = userName;
+	public void setUser(final String userName) {
+		this.user = userName;
 	}
 }

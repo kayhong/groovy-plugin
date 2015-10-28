@@ -24,7 +24,7 @@ public final class ImportHtml5ApplicationContentMojo extends
 	private String host;
 
 	@Parameter(property = APPLICATION_PROPERTY, required = true)
-	private String name;
+	private String application;
 
 	@Parameter(property = PASSWORD_PROPERTY)
 	private String password;
@@ -36,7 +36,7 @@ public final class ImportHtml5ApplicationContentMojo extends
 	private int proxyPort;
 
 	@Parameter(property = USER_PROPERTY, required = true)
-	private String userName;
+	private String user;
 
 	@Parameter(property = VERSION_PROPERTY, required = true)
 	private String version;
@@ -44,48 +44,48 @@ public final class ImportHtml5ApplicationContentMojo extends
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		Html5ApplicationService service = this.createHtml5ApplicationService(
-				this.host, this.account, this.userName, this.password,
+				this.host, this.account, this.user, this.password,
 				this.proxyHost, this.proxyPort);
 
 		this.getLog()
 				.info(String
 						.format("Importing HTML5 application content:\n\tapplication: %1$s\n\taccount: %2$s\n\thost: %3$s\n\tuser: %4$s\n\tversion: %5$s\n\tcontent source:%6$s\n",
-								this.name, this.account, this.host,
-								this.userName, this.version,
+								this.application, this.account, this.host,
+								this.user, this.version,
 								this.content.getAbsolutePath()));
 
 		try {
-			service.importApplicationContent(this.name, this.version,
+			service.importApplicationContent(this.application, this.version,
 					this.content);
 
 			this.getLog()
 					.info(String
 							.format("Successfully imported HTML5 application content\n\tname: %1$s\n\tversion: %2$s\n\tcontent source: %3$s\n",
-									this.name, this.version,
+									this.application, this.version,
 									this.content.getAbsolutePath()));
 		} catch (RuntimeException e) {
 			this.getLog()
 					.error(String
 							.format("Failed to import HTML5 application content\n\tname: %1$s\n\tversion: %2$s\n\tcontent source: %3$s\n",
-									this.name, this.version,
+									this.application, this.version,
 									this.content.getAbsolutePath()));
 
 			throw new MojoExecutionException(
 					String.format(
 							"An error occured while importing the \"%1$s\" HTML5 application content \"%2$s\" from content source \"%3$s\"",
-							this.name, this.version,
+							this.application, this.version,
 							this.content.getAbsolutePath()), e);
 		} catch (IOException e) {
 			this.getLog()
 					.error(String
 							.format("Failed to import HTML5 application content\n\tname: %1$s\n\tversion: %2$s\n\tcontent source: %3$s\n",
-									this.name, this.version,
+									this.application, this.version,
 									this.content.getAbsolutePath()));
 
 			throw new MojoExecutionException(
 					String.format(
 							"An error occured while importing the \"%1$s\" HTML5 application content \"%2$s\" from content source \"%3$s\"",
-							this.name, this.version,
+							this.application, this.version,
 							this.content.getAbsolutePath()), e);
 		}
 	}
@@ -96,7 +96,7 @@ public final class ImportHtml5ApplicationContentMojo extends
 	}
 
 	public void setApplication(final String application) {
-		this.name = application;
+		this.application = application;
 	}
 
 	public void setContent(final File content) {
@@ -124,8 +124,8 @@ public final class ImportHtml5ApplicationContentMojo extends
 	}
 
 	@Override
-	public void setUserName(final String userName) {
-		this.userName = userName;
+	public void setUser(final String userName) {
+		this.user = userName;
 	}
 
 	public void setVersion(final String version) {

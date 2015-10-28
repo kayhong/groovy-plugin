@@ -14,11 +14,11 @@ public final class StartHtml5ApplicationMojo extends
 	@Parameter(property = ACCOUNT_PROPERTY, required = true)
 	private String account;
 
+	@Parameter(property = APPLICATION_PROPERTY, required = true)
+	private String application;
+
 	@Parameter(property = HOST_PROPERTY, required = true)
 	private String host;
-
-	@Parameter(property = APPLICATION_PROPERTY, required = true)
-	private String name;
 
 	@Parameter(property = PASSWORD_PROPERTY)
 	private String password;
@@ -30,38 +30,38 @@ public final class StartHtml5ApplicationMojo extends
 	private int proxyPort;
 
 	@Parameter(property = USER_PROPERTY, required = true)
-	private String userName;
+	private String user;
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		Html5ApplicationService service = this.createHtml5ApplicationService(
-				this.host, this.account, this.userName, this.password,
+				this.host, this.account, this.user, this.password,
 				this.proxyHost, this.proxyPort);
 
 		this.getLog()
 				.info(String
 						.format("Starting HTML5 application:\n\tapplication: %1$s\n\taccount: %2$s\n\thost: %3$s\n\tuser: %4$s\n",
-								this.name, this.account, this.host,
-								this.userName));
+								this.application, this.account, this.host,
+								this.user));
 
 		try {
-			service.startApplication(this.name);
+			service.startApplication(this.application);
 
 			this.getLog()
 					.info(String
 							.format("Successfully started HTML5 application\n\tname: %1$s\n",
-									this.name));
+									this.application));
 
 		} catch (RuntimeException e) {
 			this.getLog().error(
 					String.format(
 							"Failed to start the \"%1$s\" HTML5 application.",
-							this.name));
+							this.application));
 
 			throw new MojoExecutionException(
 					String.format(
 							"An error occured while starting the \"%1$s\" HTML5 application",
-							this.name), e);
+							this.application), e);
 		}
 	}
 
@@ -71,7 +71,7 @@ public final class StartHtml5ApplicationMojo extends
 	}
 
 	public void setApplication(final String application) {
-		this.name = application;
+		this.application = application;
 	}
 
 	@Override
@@ -95,7 +95,7 @@ public final class StartHtml5ApplicationMojo extends
 	}
 
 	@Override
-	public void setUserName(final String userName) {
-		this.userName = userName;
+	public void setUser(final String userName) {
+		this.user = userName;
 	}
 }

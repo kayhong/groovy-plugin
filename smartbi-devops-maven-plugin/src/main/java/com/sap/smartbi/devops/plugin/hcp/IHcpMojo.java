@@ -11,5 +11,5 @@ public interface IHcpMojo {
 
 	void setProxyPort(int proxyPort);
 
-	void setUserName(final String userName);
+	void setUser(final String user);
 }

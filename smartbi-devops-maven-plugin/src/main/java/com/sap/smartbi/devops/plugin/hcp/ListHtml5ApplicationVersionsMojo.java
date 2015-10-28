@@ -17,11 +17,11 @@ public final class ListHtml5ApplicationVersionsMojo extends
 	@Parameter(property = ACCOUNT_PROPERTY, required = true)
 	private String account;
 
+	@Parameter(property = APPLICATION_PROPERTY, required = true)
+	private String application;
+
 	@Parameter(property = HOST_PROPERTY, required = true)
 	private String host;
-
-	@Parameter(property = APPLICATION_PROPERTY, required = true)
-	private String name;
 
 	@Parameter(property = PASSWORD_PROPERTY)
 	private String password;
@@ -33,22 +33,22 @@ public final class ListHtml5ApplicationVersionsMojo extends
 	private int proxyPort;
 
 	@Parameter(property = USER_PROPERTY, required = true)
-	private String userName;
+	private String user;
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		Html5ApplicationService service = this.createHtml5ApplicationService(
-				this.host, this.account, this.userName, this.password,
+				this.host, this.account, this.user, this.password,
 				this.proxyHost, this.proxyPort);
 
 		this.getLog()
 				.info(String
 						.format("Retrieving HTML5 application versions:\n\taccount: %1$s\n\thost: %2$s\n\tuser: %3$s\n",
-								this.account, this.host, this.userName));
+								this.account, this.host, this.user));
 
 		try {
 			Collection<Html5ApplicationVersion> versions = service
-					.listApplicationVersions(this.name);
+					.listApplicationVersions(this.application);
 
 			this.getLog().info(
 					"Successfully retrieved HTML5 application versions\n");
@@ -74,7 +74,7 @@ public final class ListHtml5ApplicationVersionsMojo extends
 	}
 
 	public void setApplication(final String application) {
-		this.name = application;
+		this.application = application;
 	}
 
 	@Override
@@ -98,7 +98,7 @@ public final class ListHtml5ApplicationVersionsMojo extends
 	}
 
 	@Override
-	public void setUserName(final String userName) {
-		this.userName = userName;
+	public void setUser(final String userName) {
+		this.user = userName;
 	}
 }

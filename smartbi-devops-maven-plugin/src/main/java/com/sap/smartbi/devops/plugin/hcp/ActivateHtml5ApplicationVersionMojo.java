@@ -14,11 +14,11 @@ public final class ActivateHtml5ApplicationVersionMojo extends
 	@Parameter(property = ACCOUNT_PROPERTY, required = true)
 	private String account;
 
+	@Parameter(property = APPLICATION_PROPERTY, required = true)
+	private String application;
+
 	@Parameter(property = HOST_PROPERTY, required = true)
 	private String host;
-
-	@Parameter(property = APPLICATION_PROPERTY, required = true)
-	private String name;
 
 	@Parameter(property = PASSWORD_PROPERTY)
 	private String password;
@@ -30,7 +30,7 @@ public final class ActivateHtml5ApplicationVersionMojo extends
 	private int proxyPort;
 
 	@Parameter(property = USER_PROPERTY, required = true)
-	private String userName;
+	private String user;
 
 	@Parameter(property = VERSION_PROPERTY, required = true)
 	private String version;
@@ -38,33 +38,33 @@ public final class ActivateHtml5ApplicationVersionMojo extends
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		Html5ApplicationService service = this.createHtml5ApplicationService(
-				this.host, this.account, this.userName, this.password,
+				this.host, this.account, this.user, this.password,
 				this.proxyHost, this.proxyPort);
 
 		this.getLog()
 				.info(String
 						.format("Activating HTML5 application version:\n\tapplication: %1$s\n\taccount: %2$s\n\thost: %3$s\n\tuser: %4$s\n\tversion: %5$s\n",
-								this.name, this.account, this.host,
-								this.userName, this.version));
+								this.application, this.account, this.host,
+								this.user, this.version));
 
 		try {
-			service.activateApplicationVersion(this.name, this.version);
+			service.activateApplicationVersion(this.application, this.version);
 
 			this.getLog()
 					.info(String
 							.format("Successfully activated HTML5 application version\n\tname: %1$s\n\tversion: %2$s\n",
-									this.name, this.version));
+									this.application, this.version));
 
 		} catch (RuntimeException e) {
 			this.getLog()
 					.error(String
 							.format("Failed to activate the HTML5 application version\n\tname: %1$s\n\tversion: %2$s\n",
-									this.name, this.version));
+									this.application, this.version));
 
 			throw new MojoExecutionException(
 					String.format(
 							"An error occured while activating the \"%1$s\" HTML5 application version \"%2$s\"",
-							this.name, this.version), e);
+							this.application, this.version), e);
 		}
 	}
 
@@ -74,7 +74,7 @@ public final class ActivateHtml5ApplicationVersionMojo extends
 	}
 	
 	public void setApplication(final String application) {
-		this.name = application;
+		this.application = application;
 	}
 
 	@Override
@@ -98,8 +98,8 @@ public final class ActivateHtml5ApplicationVersionMojo extends
 	}
 
 	@Override
-	public void setUserName(final String userName) {
-		this.userName = userName;
+	public void setUser(final String userName) {
+		this.user = userName;
 	}
 
 	public void setVersion(final String version) {

@@ -14,6 +14,9 @@ public final class DeleteHtml5ApplicationMojo extends
 	@Parameter(property = ACCOUNT_PROPERTY, required = true)
 	private String account;
 
+	@Parameter(property = APPLICATION_PROPERTY, required = true)
+	private String application;
+
 	@Parameter(property = DELETE_REPOSITORY_PROPERTY, defaultValue = "true")
 	private boolean deleteRepository;
 
@@ -22,9 +25,6 @@ public final class DeleteHtml5ApplicationMojo extends
 
 	@Parameter(property = HOST_PROPERTY, required = true)
 	private String host;
-
-	@Parameter(property = APPLICATION_PROPERTY, required = true)
-	private String application;
 
 	@Parameter(property = PASSWORD_PROPERTY)
 	private String password;
@@ -110,7 +110,7 @@ public final class DeleteHtml5ApplicationMojo extends
 	}
 
 	@Override
-	public void setUserName(String userName) {
+	public void setUser(String userName) {
 		this.user = userName;
 	}
 }

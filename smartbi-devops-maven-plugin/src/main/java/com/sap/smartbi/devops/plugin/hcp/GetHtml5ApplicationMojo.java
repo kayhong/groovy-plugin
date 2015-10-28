@@ -14,11 +14,11 @@ public final class GetHtml5ApplicationMojo extends AbstractHtml5ApplicationMojo 
 	@Parameter(property = ACCOUNT_PROPERTY, required = true)
 	private String account;
 
+	@Parameter(property = APPLICATION_PROPERTY, required = true)
+	private String application;
+
 	@Parameter(property = HOST_PROPERTY, required = true)
 	private String host;
-
-	@Parameter(property = APPLICATION_PROPERTY, required = true)
-	private String name;
 
 	@Parameter(property = PASSWORD_PROPERTY)
 	private String password;
@@ -30,22 +30,22 @@ public final class GetHtml5ApplicationMojo extends AbstractHtml5ApplicationMojo 
 	private int proxyPort;
 
 	@Parameter(property = USER_PROPERTY, required = true)
-	private String userName;
+	private String user;
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		Html5ApplicationService service = this.createHtml5ApplicationService(
-				this.host, this.account, this.userName, this.password,
+				this.host, this.account, this.user, this.password,
 				this.proxyHost, this.proxyPort);
 
 		this.getLog()
 				.info(String
 						.format("Retrieving HTML5 application details:\n\tapplication: %1$s\n\taccount: %2$s\n\thost: %3$s\n\tuser: %4$s\n",
-								this.name, this.account, this.host,
-								this.userName));
+								this.application, this.account, this.host,
+								this.user));
 
 		try {
-			Html5Application application = service.getApplication(this.name);
+			Html5Application application = service.getApplication(this.application);
 
 			this.getLog()
 					.info(String
@@ -64,12 +64,12 @@ public final class GetHtml5ApplicationMojo extends AbstractHtml5ApplicationMojo 
 			this.getLog()
 					.error(String
 							.format("Failed to retrieve the \"%1$s\" HTML5 application details.",
-									this.name));
+									this.application));
 
 			throw new MojoExecutionException(
 					String.format(
 							"An error occured while retrieving the \"%1$s\" HTML5 application details",
-							this.name), e);
+							this.application), e);
 		}
 	}
 
@@ -79,7 +79,7 @@ public final class GetHtml5ApplicationMojo extends AbstractHtml5ApplicationMojo 
 	}
 
 	public void setApplication(final String application) {
-		this.name = application;
+		this.application = application;
 	}
 
 	@Override
@@ -103,7 +103,7 @@ public final class GetHtml5ApplicationMojo extends AbstractHtml5ApplicationMojo 
 	}
 
 	@Override
-	public void setUserName(final String userName) {
-		this.userName = userName;
+	public void setUser(final String userName) {
+		this.user = userName;
 	}
 }

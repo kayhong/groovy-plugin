@@ -16,7 +16,7 @@
 				<configuration>
 					<host>neo.ondemand.com</host>
 					<account>x389dec7d</account>
-					<userName>P1941054458</userName>
+					<user>P1941054458</user>
 					<password>Nett2014</password>
 					<proxyHost>proxy</proxyHost>
 					<proxyPort>8080</proxyPort>
