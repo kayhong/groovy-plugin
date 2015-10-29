@@ -20,6 +20,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.Status.Family;
+import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.core.UriBuilder;
 
 import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
@@ -628,9 +629,9 @@ public final class Html5ApplicationService {
 					.method(method, entity);
 		}
 
-		Family family = Status.fromStatusCode(response.getStatus()).getFamily();
+		StatusType statusType = response.getStatusInfo();
 
-		switch (family) {
+		switch (statusType.getFamily()) {
 		case CLIENT_ERROR:
 		case SERVER_ERROR: {
 			String details = null;
@@ -641,8 +642,22 @@ public final class Html5ApplicationService {
 				// Nothing
 			}
 
+			String message = null;
+
+			if (details == null) {
+				message = String.format(
+						"%1$s: status code = %2$d, reason = \"%3$s\"",
+						statusType.getFamily(), response.getStatus(),
+						statusType.getReasonPhrase());
+			} else {
+				message = String.format(
+						"%1$s: status code = %2$d, reason = \"%3$s\" (%4$s)",
+						statusType.getFamily(), response.getStatus(),
+						statusType.getReasonPhrase(), details);
+			}
+
 			// TODO improve error reporting!
-			throw new RuntimeException(details);
+			throw new RuntimeException(message);
 		}
 
 		case INFORMATIONAL:
