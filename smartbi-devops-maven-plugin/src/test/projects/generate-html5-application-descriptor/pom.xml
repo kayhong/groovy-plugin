@@ -1,0 +1,46 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.sap.smartbi.devops</groupId>
+	<artifactId>generate-application-descriptor-test</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+
+	<packaging>pom</packaging>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.sap.smartbi.devops</groupId>
+				<artifactId>smartbi-devops-maven-plugin</artifactId>
+				<configuration>
+					<authenticationMethod>saml</authenticationMethod>
+					<welcomePath>/path/index.html</welcomePath>
+					<logoutPath>/logout.html</logoutPath>
+					<descriptor>neo-app.json</descriptor>
+					<routes>
+						<route>
+							<description>some description</description>
+							<path>/path</path>
+							<target>
+								<type>destination</type>
+								<name>some-name</name>
+								<path>/subpath</path>
+								<version>0.0.1</version>
+							</target>
+						</route>
+					</routes>
+					<securityConstraints>
+						<securityConstraint>
+							<permissionName>use application</permissionName>
+							<protectedPaths>
+								<param>path1</param>
+								<param>path2</param>
+							</protectedPaths>
+						</securityConstraint>
+					</securityConstraints>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.sap.smartbi.devops</groupId>
-	<artifactId>restart-html5-application-test</artifactId>
+	<artifactId>restart-application-test</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
 	<packaging>pom</packaging>

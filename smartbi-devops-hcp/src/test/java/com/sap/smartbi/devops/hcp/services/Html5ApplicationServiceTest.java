@@ -16,14 +16,16 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.sap.smartbi.devops.hcp.models.HcpConnectionInfo;
-import com.sap.smartbi.devops.hcp.models.Html5Application;
-import com.sap.smartbi.devops.hcp.models.Html5ApplicationCommit;
-import com.sap.smartbi.devops.hcp.models.Html5ApplicationVersion;
+import com.sap.smartbi.devops.hcp.models.html5.Application;
+import com.sap.smartbi.devops.hcp.models.html5.Commit;
+import com.sap.smartbi.devops.hcp.models.html5.HcpConnectionInfo;
+import com.sap.smartbi.devops.hcp.models.html5.Subscription;
+import com.sap.smartbi.devops.hcp.models.html5.Version;
 
 public final class Html5ApplicationServiceTest {
 
 	private static HcpConnectionInfo CONNECTION_INFO;
+	private static HcpConnectionInfo CONSUMER_CONNECTION_INFO;
 
 	@BeforeClass
 	public static void loadHcpConnectionProperties() {
@@ -44,12 +46,16 @@ public final class Html5ApplicationServiceTest {
 
 		String host = properties.getProperty("host");
 		String account = properties.getProperty("account");
+		String consumerAccount = properties.getProperty("consumer.account");
 		String user = properties.getProperty("user");
 		String password = properties.getProperty("password");
 		String proxyUri = properties.getProperty("proxy.uri");
 
 		CONNECTION_INFO = new HcpConnectionInfo(host, account, user, password,
 				proxyUri == null ? null : URI.create(proxyUri));
+
+		CONSUMER_CONNECTION_INFO = new HcpConnectionInfo(host, consumerAccount,
+				user, password, proxyUri == null ? null : URI.create(proxyUri));
 	}
 
 	@Test
@@ -127,11 +133,132 @@ public final class Html5ApplicationServiceTest {
 	}
 
 	@Test
-	public void testGetInstance() {
+	public void testCreateSubscription() {
+		Html5ApplicationService service1 = Html5ApplicationService
+				.getInstance(CONNECTION_INFO);
+
+		Html5ApplicationService service2 = Html5ApplicationService
+				.getInstance(CONSUMER_CONNECTION_INFO);
+
+		Application application = null;
+
+		try {
+			String name = createSomehowUniqueApplicationName();
+			String providerName = createSomehowUniqueApplicationName();
+
+			application = service1.createApplication(providerName);
+
+			Assert.assertTrue(service1.createSubscriptionCandidate(
+					providerName, CONSUMER_CONNECTION_INFO.getAccount()));
+
+			Subscription subscription = service2.createSubscription(name,
+					CONNECTION_INFO.getAccount(), providerName);
+
+			Assert.assertNotNull(subscription);
+			Assert.assertEquals(name, subscription.getName());
+			Assert.assertEquals(CONNECTION_INFO.getAccount(),
+					subscription.getProviderAccount());
+			Assert.assertEquals(providerName, subscription.getProviderName());
+			Assert.assertNotNull(subscription.getUri());
+		} finally {
+			if (application != null) {
+				service1.deleteApplication(application.getName());
+			}
+		}
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void testCreateSubscriptionNullName() {
+		Html5ApplicationService.getInstance(CONSUMER_CONNECTION_INFO)
+				.createSubscription(null, CONNECTION_INFO.getAccount(),
+						createSomehowUniqueApplicationName());
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testCreateSubscriptionEmptyName() {
+		Html5ApplicationService.getInstance(CONSUMER_CONNECTION_INFO)
+				.createSubscription("", CONNECTION_INFO.getAccount(),
+						createSomehowUniqueApplicationName());
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void testCreateSubscriptionNullProviderAccount() {
+		Html5ApplicationService.getInstance(CONSUMER_CONNECTION_INFO)
+				.createSubscription(createSomehowUniqueApplicationName(), null,
+						createSomehowUniqueApplicationName());
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testCreateSubscriptionEmptyProviderAccount() {
+		Html5ApplicationService.getInstance(CONSUMER_CONNECTION_INFO)
+				.createSubscription(createSomehowUniqueApplicationName(), "",
+						createSomehowUniqueApplicationName());
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void testCreateSubscriptionNullProviderName() {
+		Html5ApplicationService.getInstance(CONSUMER_CONNECTION_INFO)
+				.createSubscription(createSomehowUniqueApplicationName(),
+						CONNECTION_INFO.getAccount(), null);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testCreateSubscriptionEmptyProviderName() {
+		Html5ApplicationService.getInstance(CONSUMER_CONNECTION_INFO)
+				.createSubscription(createSomehowUniqueApplicationName(),
+						CONNECTION_INFO.getAccount(), "");
+	}
+
+	@Test
+	public void testCreateSubscriptionCandidate() {
 		Html5ApplicationService service = Html5ApplicationService
 				.getInstance(CONNECTION_INFO);
 
-		Assert.assertNotNull(service);
+		Application application = null;
+
+		try {
+			String name = createSomehowUniqueApplicationName();
+
+			application = service.createApplication(name);
+
+			Assert.assertNotNull(application);
+			Assert.assertEquals(name, application.getName());
+
+			Assert.assertTrue(service.createSubscriptionCandidate(name,
+					CONSUMER_CONNECTION_INFO.getAccount()));
+		} finally {
+			if (application != null) {
+				service.deleteApplication(application.getName());
+			}
+		}
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testCreateSubscriptionCandidateEmptyConsumerAccount() {
+		Html5ApplicationService.getInstance(CONNECTION_INFO)
+				.createSubscriptionCandidate(
+						createSomehowUniqueApplicationName(), "");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testCreateSubscriptionCandidateEmptyName() {
+		Html5ApplicationService.getInstance(CONNECTION_INFO)
+				.createSubscriptionCandidate("",
+						CONSUMER_CONNECTION_INFO.getAccount());
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void testCreateSubscriptionCandidateNullConsumerAccount() {
+		Html5ApplicationService.getInstance(CONNECTION_INFO)
+				.createSubscriptionCandidate(
+						createSomehowUniqueApplicationName(), null);
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void testCreateSubscriptionCandidateNullName() {
+		Html5ApplicationService.getInstance(CONNECTION_INFO)
+				.createSubscriptionCandidate(null,
+						CONSUMER_CONNECTION_INFO.getAccount());
 	}
 
 	@Test
@@ -139,7 +266,7 @@ public final class Html5ApplicationServiceTest {
 		Html5ApplicationService service = Html5ApplicationService
 				.getInstance(CONNECTION_INFO);
 
-		Html5Application application = null;
+		Application application = null;
 
 		try {
 			String name = createSomehowUniqueApplicationName();
@@ -167,7 +294,7 @@ public final class Html5ApplicationServiceTest {
 		Html5ApplicationService service = Html5ApplicationService
 				.getInstance(CONNECTION_INFO);
 
-		Html5Application application = null;
+		Application application = null;
 
 		try {
 			String name = createSomehowUniqueApplicationName();
@@ -204,13 +331,13 @@ public final class Html5ApplicationServiceTest {
 
 		String name = createSomehowUniqueApplicationName();
 
-		Html5Application application = service.createApplication(name);
+		Application application = service.createApplication(name);
 
 		Assert.assertNotNull(application);
 
 		service.deleteApplication(application.getName());
 
-		for (Html5Application current : service.listApplications()) {
+		for (Application current : service.listApplications()) {
 			Assert.assertNotEquals(name, current.getName());
 		}
 	}
@@ -264,15 +391,115 @@ public final class Html5ApplicationServiceTest {
 	}
 
 	@Test
+	public void testDeleteSubscription() {
+		Html5ApplicationService service1 = Html5ApplicationService
+				.getInstance(CONNECTION_INFO);
+
+		Html5ApplicationService service2 = Html5ApplicationService
+				.getInstance(CONSUMER_CONNECTION_INFO);
+
+		Application application = null;
+
+		try {
+			String name = createSomehowUniqueApplicationName();
+			String providerName = createSomehowUniqueApplicationName();
+
+			application = service1.createApplication(providerName);
+
+			Assert.assertTrue(service1.createSubscriptionCandidate(
+					providerName, CONSUMER_CONNECTION_INFO.getAccount()));
+
+			Subscription subscription = service2.createSubscription(name,
+					CONNECTION_INFO.getAccount(), providerName);
+
+			Assert.assertNotNull(subscription);
+
+			Assert.assertTrue(service2.deleteSubscription(name));
+		} finally {
+			if (application != null) {
+				service1.deleteApplication(application.getName());
+			}
+		}
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void testDeleteSubscriptionNullName() {
+		Html5ApplicationService.getInstance(CONSUMER_CONNECTION_INFO)
+				.deleteSubscription(null);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testDeleteSubscriptionEmptyName() {
+		Html5ApplicationService.getInstance(CONSUMER_CONNECTION_INFO)
+				.deleteSubscription("");
+	}
+
+	@Test
+	public void testDeleteSubscriptionCandidate() {
+		Html5ApplicationService service = Html5ApplicationService
+				.getInstance(CONNECTION_INFO);
+
+		Application application = null;
+
+		try {
+			String name = createSomehowUniqueApplicationName();
+
+			application = service.createApplication(name);
+
+			Assert.assertNotNull(application);
+			Assert.assertEquals(name, application.getName());
+
+			Assert.assertTrue(service.createSubscriptionCandidate(name,
+					CONSUMER_CONNECTION_INFO.getAccount()));
+
+			Assert.assertTrue(service.deleteSubscriptionCandidate(
+					application.getName(),
+					CONSUMER_CONNECTION_INFO.getAccount()));
+		} finally {
+			if (application != null) {
+				service.deleteApplication(application.getName());
+			}
+		}
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testDeleteSubscriptionCandidateEmptyConsumerAccount() {
+		Html5ApplicationService.getInstance(CONNECTION_INFO)
+				.deleteSubscriptionCandidate(
+						createSomehowUniqueApplicationName(), "");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testDeleteSubscriptionCandidateEmptyName() {
+		Html5ApplicationService.getInstance(CONNECTION_INFO)
+				.deleteSubscriptionCandidate("",
+						CONSUMER_CONNECTION_INFO.getAccount());
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void testDeleteSubscriptionCandidateNullConsumerAccount() {
+		Html5ApplicationService.getInstance(CONNECTION_INFO)
+				.deleteSubscriptionCandidate(
+						createSomehowUniqueApplicationName(), null);
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void testDeleteSubscriptionCandidateNullName() {
+		Html5ApplicationService.getInstance(CONNECTION_INFO)
+				.deleteSubscriptionCandidate(null,
+						CONSUMER_CONNECTION_INFO.getAccount());
+	}
+
+	@Test
 	public void testGetApplication() {
 		Html5ApplicationService service = Html5ApplicationService
 				.getInstance(CONNECTION_INFO);
 
-		Collection<Html5Application> applications = service.listApplications();
+		Collection<Application> applications = service.listApplications();
 
-		for (Html5Application application : applications) {
-			Html5Application otherApplication = service
-					.getApplication(application.getName());
+		for (Application application : applications) {
+			Application otherApplication = service.getApplication(application
+					.getName());
 
 			String name = otherApplication.getName();
 
@@ -290,6 +517,118 @@ public final class Html5ApplicationServiceTest {
 	public void testGetApplicationNullName() {
 		Html5ApplicationService.getInstance(CONNECTION_INFO).getApplication(
 				null);
+	}
+
+	@Test
+	public void testGetSubscription() {
+		Html5ApplicationService service1 = Html5ApplicationService
+				.getInstance(CONNECTION_INFO);
+
+		Html5ApplicationService service2 = Html5ApplicationService
+				.getInstance(CONSUMER_CONNECTION_INFO);
+
+		Application application = null;
+
+		try {
+			String name = createSomehowUniqueApplicationName();
+			String providerName = createSomehowUniqueApplicationName();
+
+			application = service1.createApplication(providerName);
+
+			Assert.assertNotNull(application);
+
+			Assert.assertTrue(service1.createSubscriptionCandidate(
+					providerName, CONSUMER_CONNECTION_INFO.getAccount()));
+
+			Subscription expectedSubscription = service2.createSubscription(
+					name, CONNECTION_INFO.getAccount(), providerName);
+
+			Assert.assertNotNull(expectedSubscription);
+
+			Subscription subscription = service2.getSubscription(name);
+
+			Assert.assertNotNull(subscription);
+
+			Assert.assertEquals(expectedSubscription.getActiveVersion(),
+					subscription.getActiveVersion());
+			Assert.assertEquals(name, subscription.getName());
+			Assert.assertEquals(CONNECTION_INFO.getAccount(),
+					subscription.getProviderAccount());
+			Assert.assertEquals(providerName, subscription.getProviderName());
+			Assert.assertEquals(expectedSubscription.getProviderStatus(),
+					subscription.getProviderStatus());
+			Assert.assertEquals(expectedSubscription.getStartedVersion(),
+					subscription.getStartedVersion());
+			Assert.assertEquals(expectedSubscription.getUri(),
+					subscription.getUri());
+		} finally {
+			if (application != null) {
+				service1.deleteApplication(application.getName());
+			}
+		}
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void testGetSubscriptionNullName() {
+		Html5ApplicationService.getInstance(CONSUMER_CONNECTION_INFO)
+				.getSubscription(null);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testGetSubscriptionEmptyName() {
+		Html5ApplicationService.getInstance(CONSUMER_CONNECTION_INFO)
+				.getSubscription("");
+	}
+
+	@Test
+	public void testGetSubscriptionCandidate() {
+		Html5ApplicationService service = Html5ApplicationService
+				.getInstance(CONNECTION_INFO);
+
+		Application application = null;
+
+		try {
+			String name = createSomehowUniqueApplicationName();
+
+			application = service.createApplication(name);
+
+			service.createSubscriptionCandidate(name,
+					CONSUMER_CONNECTION_INFO.getAccount());
+
+			Assert.assertTrue(service.getSubscriptionCandidate(name,
+					CONSUMER_CONNECTION_INFO.getAccount()));
+
+		} finally {
+			if (application != null) {
+				service.deleteApplication(application.getName());
+			}
+		}
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void testGetSubscriptionCandidateNullName() {
+		Html5ApplicationService.getInstance(CONNECTION_INFO)
+				.getSubscriptionCandidate(null, UUID.randomUUID().toString());
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testGetSubscriptionCandidateEmptyName() {
+		Html5ApplicationService.getInstance(CONNECTION_INFO)
+				.getSubscriptionCandidate("", UUID.randomUUID().toString());
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void testGetSubscriptionCandidateNullConsumerAccount() {
+		Html5ApplicationService.getInstance(CONNECTION_INFO)
+				.getSubscriptionCandidate(createSomehowUniqueApplicationName(),
+						null);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testGetSubscriptionCandidateEmptyConsumerAccount() {
+		Html5ApplicationService.getInstance(CONNECTION_INFO)
+				.getSubscriptionCandidate(createSomehowUniqueApplicationName(),
+						"");
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -316,14 +655,15 @@ public final class Html5ApplicationServiceTest {
 		Html5ApplicationService service = Html5ApplicationService
 				.getInstance(CONNECTION_INFO);
 
-		Html5Application application = null;
+		Application application = null;
 
 		try {
 			application = service
 					.createApplication(createSomehowUniqueApplicationName());
 
-			service.importApplicationContent(application.getName(), UUID
-					.randomUUID().toString(), directory.toFile());
+			Assert.assertTrue(service.importApplicationContent(
+					application.getName(), UUID.randomUUID().toString(),
+					directory.toFile()));
 		} finally {
 			if (application != null) {
 				service.deleteApplication(application.getName());
@@ -383,19 +723,19 @@ public final class Html5ApplicationServiceTest {
 		Html5ApplicationService service = Html5ApplicationService
 				.getInstance(CONNECTION_INFO);
 
-		Html5Application application = null;
+		Application application = null;
 
 		try {
 			application = service
 					.createApplication(createSomehowUniqueApplicationName());
 
-			Collection<Html5ApplicationCommit> commits = service
+			Collection<Commit> commits = service
 					.listApplicationCommits(application.getName());
 
 			Assert.assertNotNull(commits);
 			Assert.assertEquals(1, commits.size());
 
-			Html5ApplicationCommit commit = commits.iterator().next();
+			Commit commit = commits.iterator().next();
 
 			Assert.assertNotNull(commit);
 
@@ -450,12 +790,12 @@ public final class Html5ApplicationServiceTest {
 
 	@Test
 	public void testListApplications() {
-		Collection<Html5Application> applications = Html5ApplicationService
+		Collection<Application> applications = Html5ApplicationService
 				.getInstance(CONNECTION_INFO).listApplications();
 
 		Assert.assertNotNull(applications);
 
-		for (Html5Application application : applications) {
+		for (Application application : applications) {
 			String name = application.getName();
 
 			Assert.assertNotNull(name);
@@ -485,14 +825,14 @@ public final class Html5ApplicationServiceTest {
 		Html5ApplicationService service = Html5ApplicationService
 				.getInstance(CONNECTION_INFO);
 
-		Html5Application application = null;
+		Application application = null;
 
 		try {
 			String name = createSomehowUniqueApplicationName();
 
 			application = service.createApplication(name);
 
-			Collection<Html5ApplicationVersion> versions = service
+			Collection<Version> versions = service
 					.listApplicationVersions(application.getName());
 
 			Assert.assertNotNull(versions);
@@ -510,6 +850,120 @@ public final class Html5ApplicationServiceTest {
 	public void testListApplicationVersionsNullName() {
 		Html5ApplicationService.getInstance(CONNECTION_INFO)
 				.listApplicationVersions(null);
+	}
+
+	@Test
+	public void testListSubscriptions() {
+
+		Html5ApplicationService service1 = Html5ApplicationService
+				.getInstance(CONNECTION_INFO);
+
+		Html5ApplicationService service2 = Html5ApplicationService
+				.getInstance(CONSUMER_CONNECTION_INFO);
+
+		Collection<Subscription> subscriptions = service2.listSubscriptions();
+
+		Assert.assertNotNull(subscriptions);
+
+		Subscription subscription = null;
+
+		// "webide" application is always subscribed from account "sapwebide"
+		Assert.assertEquals(1, subscriptions.size());
+
+		subscription = subscriptions.toArray(new Subscription[] {})[0];
+
+		Assert.assertEquals("webide", subscription.getName());
+		Assert.assertEquals("sapwebide", subscription.getProviderAccount());
+		Assert.assertEquals("webide", subscription.getProviderName());
+
+		Application application = null;
+
+		try {
+			String name = createSomehowUniqueApplicationName();
+			String providerName = createSomehowUniqueApplicationName();
+
+			application = service1.createApplication(providerName);
+
+			Assert.assertNotNull(application);
+
+			Assert.assertTrue(service1.createSubscriptionCandidate(
+					providerName, CONSUMER_CONNECTION_INFO.getAccount()));
+
+			subscription = service2.createSubscription(name,
+					CONNECTION_INFO.getAccount(), providerName);
+
+			Assert.assertNotNull(subscription);
+
+			subscriptions = service2.listSubscriptions();
+
+			Assert.assertNotNull(subscriptions);
+			Assert.assertEquals(2, subscriptions.size());
+
+			boolean found = false;
+
+			for (Subscription current : subscriptions) {
+				if (name.equals(current.getName())) {
+					Assert.assertEquals(CONNECTION_INFO.getAccount(),
+							current.getProviderAccount());
+					Assert.assertEquals(providerName, current.getProviderName());
+					Assert.assertNotNull(current.getUri());
+
+					found = true;
+				}
+			}
+
+			Assert.assertTrue(found);
+		} finally {
+			if (application != null) {
+				service1.deleteApplication(application.getName());
+			}
+		}
+	}
+
+	@Test
+	public void testListSusbcriptionCandidates() {
+		Html5ApplicationService service = Html5ApplicationService
+				.getInstance(CONNECTION_INFO);
+
+		Application application = null;
+
+		try {
+			String name = createSomehowUniqueApplicationName();
+
+			application = service.createApplication(name);
+
+			Collection<String> consumerAccounts = service
+					.listSubscriptionCandidates(name);
+
+			Assert.assertNotNull(consumerAccounts);
+			Assert.assertEquals(0, consumerAccounts.size());
+
+			service.createSubscriptionCandidate(name,
+					CONSUMER_CONNECTION_INFO.getAccount());
+
+			consumerAccounts = service.listSubscriptionCandidates(name);
+
+			Assert.assertNotNull(consumerAccounts);
+			Assert.assertEquals(1, consumerAccounts.size());
+			Assert.assertEquals(CONSUMER_CONNECTION_INFO.getAccount(),
+					consumerAccounts.toArray(new String[] {})[0]);
+		} finally {
+			if (application != null) {
+				service.deleteApplication(application.getName());
+			}
+		}
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void testListSubscriptionCandidatesNullName() {
+		Html5ApplicationService.getInstance(CONNECTION_INFO)
+				.listSubscriptionCandidates(null);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testListSubscriptionCandidatesEmptyName() {
+		Html5ApplicationService.getInstance(CONNECTION_INFO)
+				.listSubscriptionCandidates("");
 	}
 
 	@Test(expected = IllegalArgumentException.class)

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.sap.smartbi.devops</groupId>
-	<artifactId>import-html5-application-content-test</artifactId>
+	<artifactId>import-application-content-test</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
 	<packaging>pom</packaging>

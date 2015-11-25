@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -16,10 +17,10 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.Response.Status.Family;
 import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.core.UriBuilder;
 
@@ -28,14 +29,16 @@ import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 
-import com.sap.smartbi.devops.hcp.internal.models.DeleteApplicationError;
-import com.sap.smartbi.devops.hcp.internal.models.Html5ApplicationCommitImpl;
-import com.sap.smartbi.devops.hcp.internal.models.Html5ApplicationImpl;
-import com.sap.smartbi.devops.hcp.internal.models.Html5ApplicationVersionImpl;
-import com.sap.smartbi.devops.hcp.models.HcpConnectionInfo;
-import com.sap.smartbi.devops.hcp.models.Html5Application;
-import com.sap.smartbi.devops.hcp.models.Html5ApplicationCommit;
-import com.sap.smartbi.devops.hcp.models.Html5ApplicationVersion;
+import com.sap.smartbi.devops.hcp.internal.models.html5.ApplicationImpl;
+import com.sap.smartbi.devops.hcp.internal.models.html5.CommitImpl;
+import com.sap.smartbi.devops.hcp.internal.models.html5.DeleteApplicationError;
+import com.sap.smartbi.devops.hcp.internal.models.html5.SubscriptionImpl;
+import com.sap.smartbi.devops.hcp.internal.models.html5.VersionImpl;
+import com.sap.smartbi.devops.hcp.models.html5.Application;
+import com.sap.smartbi.devops.hcp.models.html5.Commit;
+import com.sap.smartbi.devops.hcp.models.html5.HcpConnectionInfo;
+import com.sap.smartbi.devops.hcp.models.html5.Subscription;
+import com.sap.smartbi.devops.hcp.models.html5.Version;
 
 public final class Html5ApplicationService {
 
@@ -76,7 +79,7 @@ public final class Html5ApplicationService {
 		return new Html5ApplicationService(connectionInfo);
 	}
 
-	public void activateApplicationVersion(final String name, String version) {
+	public boolean activateApplicationVersion(final String name, String version) {
 		if (name == null) {
 			throw new NullPointerException("\"name\" is null");
 		}
@@ -110,6 +113,8 @@ public final class Html5ApplicationService {
 		try {
 			response = this.invokeService(uri, HttpMethod.POST,
 					Entity.entity("ACTIVATE", MediaType.APPLICATION_JSON));
+
+			return Status.OK == Status.fromStatusCode(response.getStatus());
 		} finally {
 			if (response != null) {
 				response.close();
@@ -117,23 +122,23 @@ public final class Html5ApplicationService {
 		}
 	}
 
-	public Html5Application createApplication(final String name) {
+	public Application createApplication(final String name) {
 		return this.doCreateApplication(name, null, null, false);
 	}
 
-	public Html5Application createApplication(final String name,
+	public Application createApplication(final String name,
 			final String displayName) {
 		return this.doCreateApplication(name, displayName, null, false);
 	}
 
-	public Html5Application createApplication(final String name,
+	public Application createApplication(final String name,
 			final String displayName, final String repository,
 			boolean cloudRepository) {
 		return this.doCreateApplication(name, displayName, repository,
 				cloudRepository);
 	}
 
-	public void createApplicationVersion(final String name,
+	public Version createApplicationVersion(final String name,
 			final String version, final String commitId) {
 		if (name == null) {
 			throw new NullPointerException("\"name\" is null");
@@ -172,9 +177,136 @@ public final class Html5ApplicationService {
 		Response response = null;
 
 		try {
+			VersionImpl newVersion = new VersionImpl(version, commitId);
+
+			response = this.invokeService(uri, HttpMethod.POST,
+					Entity.entity(newVersion, MediaType.APPLICATION_JSON));
+
+			return newVersion;
+		} finally {
+			if (response != null) {
+				response.close();
+			}
+		}
+	}
+
+	public Subscription createSubscription(final String name,
+			final String providerAccount, final String providerName) {
+		if (name == null) {
+			throw new NullPointerException("\"name\" is null");
+		}
+
+		if (name.length() == 0) {
+			throw new IllegalArgumentException("\"name\" is empty");
+		}
+
+		if (providerAccount == null) {
+			throw new NullPointerException("\"providerAccount\" is null");
+		}
+
+		if (providerAccount.length() == 0) {
+			throw new IllegalArgumentException("\"providerAccount\" is empty");
+		}
+
+		if (providerName == null) {
+			throw new NullPointerException("\"providerName\" is null");
+		}
+
+		if (providerName.length() == 0) {
+			throw new IllegalArgumentException("\"providerName\" is empty");
+		}
+
+		assert this.connectionInfo != null : "\"this.connectionInfo\" should not be null";
+
+		URI uri = UriBuilder
+				.fromUri(URI_TEMPLATE)
+				.path("subscriptions")
+				.build(this.connectionInfo.getHost(),
+						this.connectionInfo.getAccount());
+
+		SubscriptionImpl subscription = new SubscriptionImpl();
+
+		subscription.setName(name);
+		subscription.setProviderAccount(providerAccount);
+		subscription.setProviderName(providerName);
+		subscription.setCreateStickyCandidate(false);
+
+		Response response = null;
+
+		try {
 			response = this.invokeService(uri, HttpMethod.POST, Entity.entity(
-					new Html5ApplicationVersionImpl(version, commitId),
-					MediaType.APPLICATION_JSON));
+					subscription, MediaType.APPLICATION_JSON_TYPE));
+
+		} finally {
+			if (response != null) {
+				response.close();
+			}
+		}
+
+		if (Status.CREATED == Status.fromStatusCode(response.getStatus())) {
+			uri = UriBuilder
+					.fromUri(URI_TEMPLATE)
+					.path("subscriptions")
+					.path(name)
+					.build(this.connectionInfo.getHost(),
+							this.connectionInfo.getAccount());
+
+			response = null;
+
+			try {
+				response = this.invokeService(uri, HttpMethod.GET);
+
+				subscription = response.readEntity(SubscriptionImpl.class);
+			} finally {
+				if (response != null) {
+					response.close();
+				}
+			}
+		} else {
+			// TODO throw some significant exception!!!
+			throw new RuntimeException("HTML5 application was not created");
+		}
+
+		return subscription;
+	}
+
+	public boolean createSubscriptionCandidate(final String name,
+			final String consumerAccount) {
+		if (name == null) {
+			throw new NullPointerException("\"name\" is null");
+		}
+
+		if (name.length() == 0) {
+			throw new IllegalArgumentException("\"name\" is empty");
+		}
+
+		if (consumerAccount == null) {
+			throw new NullPointerException("\"consumerAccount\" is null");
+		}
+
+		if (consumerAccount.length() == 0) {
+			throw new IllegalArgumentException("\"consumerAccount\" is empty");
+		}
+
+		assert this.connectionInfo != null : "\"this.connectionInfo\" should not be null";
+
+		URI uri = UriBuilder
+				.fromUri(URI_TEMPLATE)
+				.path("applications")
+				.path(name)
+				.path("subscriptioncandidates")
+				.path(consumerAccount)
+				.build(this.connectionInfo.getHost(),
+						this.connectionInfo.getAccount());
+
+		Response response = null;
+
+		try {
+			response = this.invokeService(uri, HttpMethod.PUT,
+					Entity.entity("", MediaType.APPLICATION_JSON_TYPE));
+
+			return Status.NO_CONTENT == Status.fromStatusCode(response
+					.getStatus());
 		} finally {
 			if (response != null) {
 				response.close();
@@ -195,7 +327,82 @@ public final class Html5ApplicationService {
 		this.doDeleteApplication(name, deleteRepository, deleteSubscriptions);
 	}
 
-	public Html5Application getApplication(final String name) {
+	public boolean deleteSubscription(final String name) {
+		if (name == null) {
+			throw new NullPointerException("\"name\" is null");
+		}
+
+		if (name.length() == 0) {
+			throw new IllegalArgumentException("\"name\" is empty");
+		}
+
+		assert this.connectionInfo != null : "\"this.connectionInfo\" should not be null";
+
+		URI uri = UriBuilder
+				.fromUri(URI_TEMPLATE)
+				.path("subscriptions")
+				.path(name)
+				.build(this.connectionInfo.getHost(),
+						this.connectionInfo.getAccount());
+
+		Response response = null;
+
+		try {
+			response = this.invokeService(uri, HttpMethod.DELETE);
+
+			return Status.NO_CONTENT == Status.fromStatusCode(response
+					.getStatus());
+		} finally {
+			if (response != null) {
+				response.close();
+			}
+		}
+	}
+
+	public boolean deleteSubscriptionCandidate(final String name,
+			final String consumerAccount) {
+		if (name == null) {
+			throw new NullPointerException("\"name\" is null");
+		}
+
+		if (name.length() == 0) {
+			throw new IllegalArgumentException("\"name\" is empty");
+		}
+
+		if (consumerAccount == null) {
+			throw new NullPointerException("\"consumerAccount\" is null");
+		}
+
+		if (consumerAccount.length() == 0) {
+			throw new IllegalArgumentException("\"consumerAccount\" is empty");
+		}
+
+		assert this.connectionInfo != null : "\"this.connectionInfo\" should not be null";
+
+		URI uri = UriBuilder
+				.fromUri(URI_TEMPLATE)
+				.path("applications")
+				.path(name)
+				.path("subscriptioncandidates")
+				.path(consumerAccount)
+				.build(this.connectionInfo.getHost(),
+						this.connectionInfo.getAccount());
+
+		Response response = null;
+
+		try {
+			response = this.invokeService(uri, HttpMethod.DELETE);
+
+			return Status.NO_CONTENT == Status.fromStatusCode(response
+					.getStatus());
+		} finally {
+			if (response != null) {
+				response.close();
+			}
+		}
+	}
+
+	public Application getApplication(final String name) {
 		if (name == null) {
 			throw new NullPointerException("\"name\" is null");
 		}
@@ -218,7 +425,7 @@ public final class Html5ApplicationService {
 		try {
 			response = this.invokeService(uri, HttpMethod.GET);
 
-			return response.readEntity(Html5ApplicationImpl.class);
+			return response.readEntity(ApplicationImpl.class);
 		} finally {
 			if (response != null) {
 				response.close();
@@ -226,7 +433,81 @@ public final class Html5ApplicationService {
 		}
 	}
 
-	public void importApplicationContent(final String name,
+	public Subscription getSubscription(final String name) {
+		if (name == null) {
+			throw new NullPointerException("\"name\" is null");
+		}
+
+		if (name.length() == 0) {
+			throw new IllegalArgumentException("\"name\" is empty");
+		}
+
+		assert this.connectionInfo != null : "\"this.connectionInfo\" should not be null";
+
+		URI uri = UriBuilder
+				.fromUri(URI_TEMPLATE)
+				.path("subscriptions")
+				.path(name)
+				.build(this.connectionInfo.getHost(),
+						this.connectionInfo.getAccount());
+
+		Response response = null;
+
+		try {
+			response = this.invokeService(uri, HttpMethod.GET);
+
+			return response.readEntity(SubscriptionImpl.class);
+		} finally {
+			if (response != null) {
+				response.close();
+			}
+		}
+	}
+
+	public boolean getSubscriptionCandidate(final String name,
+			final String consumerAccount) {
+		if (name == null) {
+			throw new NullPointerException("\"name\" is null");
+		}
+
+		if (name.length() == 0) {
+			throw new IllegalArgumentException("\"name\" is empty");
+		}
+
+		if (consumerAccount == null) {
+			throw new NullPointerException("\"consumerAccount\" is null");
+		}
+
+		if (consumerAccount.length() == 0) {
+			throw new IllegalArgumentException("\"consumerAccount\" is empty");
+		}
+
+		assert this.connectionInfo != null : "\"this.connectionInfo\" should not be null";
+
+		URI uri = UriBuilder
+				.fromUri(URI_TEMPLATE)
+				.path("applications")
+				.path(name)
+				.path("subscriptioncandidates")
+				.path(consumerAccount)
+				.build(this.connectionInfo.getHost(),
+						this.connectionInfo.getAccount());
+
+		Response response = null;
+
+		try {
+			response = this.invokeService(uri, HttpMethod.GET);
+
+			return Status.NO_CONTENT == Status.fromStatusCode(response
+					.getStatus());
+		} finally {
+			if (response != null) {
+				response.close();
+			}
+		}
+	}
+
+	public boolean importApplicationContent(final String name,
 			final String version, File directory) throws IOException {
 		if (name == null) {
 			throw new NullPointerException("\"name\" is null");
@@ -271,7 +552,6 @@ public final class Html5ApplicationService {
 				}
 			}
 		}
-		;
 
 		assert this.connectionInfo != null : "\"this.connectionInfo\" should not be null";
 
@@ -290,6 +570,9 @@ public final class Html5ApplicationService {
 		try (FileInputStream zipStream = new FileInputStream(zipFile)) {
 			response = this.invokeService(uri, HttpMethod.PUT, Entity.entity(
 					zipStream, new MediaType("application", "zip")));
+
+			return Status.CREATED == Status
+					.fromStatusCode(response.getStatus());
 		} finally {
 			if (response != null) {
 				response.close();
@@ -297,8 +580,7 @@ public final class Html5ApplicationService {
 		}
 	}
 
-	public Collection<Html5ApplicationCommit> listApplicationCommits(
-			final String name) {
+	public Collection<Commit> listApplicationCommits(final String name) {
 		if (name == null) {
 			throw new NullPointerException("\"name\" is null");
 		}
@@ -322,8 +604,7 @@ public final class Html5ApplicationService {
 		try {
 			response = this.invokeService(uri, HttpMethod.GET);
 
-			Html5ApplicationCommit[] commits = response
-					.readEntity(Html5ApplicationCommitImpl[].class);
+			Commit[] commits = response.readEntity(CommitImpl[].class);
 
 			return Collections.unmodifiableCollection(Arrays.asList(commits));
 		} finally {
@@ -333,7 +614,7 @@ public final class Html5ApplicationService {
 		}
 	}
 
-	public Collection<Html5Application> listApplications() {
+	public Collection<Application> listApplications() {
 		assert this.connectionInfo != null : "\"this.connectionInfo\" should not be null";
 
 		URI uri = UriBuilder
@@ -347,8 +628,8 @@ public final class Html5ApplicationService {
 		try {
 			response = this.invokeService(uri, HttpMethod.GET);
 
-			Html5Application[] applications = response
-					.readEntity(Html5ApplicationImpl[].class);
+			Application[] applications = response
+					.readEntity(ApplicationImpl[].class);
 
 			return Collections.unmodifiableCollection(Arrays
 					.asList(applications));
@@ -359,8 +640,7 @@ public final class Html5ApplicationService {
 		}
 	}
 
-	public Collection<Html5ApplicationVersion> listApplicationVersions(
-			final String name) {
+	public Collection<Version> listApplicationVersions(final String name) {
 		if (name == null) {
 			throw new NullPointerException("\"name\" is null");
 		}
@@ -384,8 +664,7 @@ public final class Html5ApplicationService {
 		try {
 			response = this.invokeService(uri, HttpMethod.GET);
 
-			Html5ApplicationVersion[] versions = response
-					.readEntity(Html5ApplicationVersionImpl[].class);
+			Version[] versions = response.readEntity(VersionImpl[].class);
 
 			return Collections.unmodifiableCollection(Arrays.asList(versions));
 		} finally {
@@ -395,19 +674,82 @@ public final class Html5ApplicationService {
 		}
 	}
 
-	public void restartApplication(final String name) {
-		this.doInvokeApplicationAction(name, "RESTART");
+	public Collection<Subscription> listSubscriptions() {
+		assert this.connectionInfo != null : "\"this.connectionInfo\" should not be null";
+
+		URI uri = UriBuilder
+				.fromUri(URI_TEMPLATE)
+				.path("subscriptions")
+				.build(this.connectionInfo.getHost(),
+						this.connectionInfo.getAccount());
+
+		Response response = null;
+
+		try {
+			response = this.invokeService(uri, HttpMethod.GET);
+
+			Subscription[] subscriptions = response
+					.readEntity(SubscriptionImpl[].class);
+
+			return Collections.unmodifiableCollection(Arrays
+					.asList(subscriptions));
+		} finally {
+			if (response != null) {
+				response.close();
+			}
+		}
 	}
 
-	public void startApplication(final String name) {
-		this.doInvokeApplicationAction(name, "START");
+	public Collection<String> listSubscriptionCandidates(final String name) {
+		if (name == null) {
+			throw new NullPointerException("\"name\" is null");
+		}
+
+		if (name.length() == 0) {
+			throw new IllegalArgumentException("\"name\" is empty");
+		}
+
+		assert this.connectionInfo != null : "\"this.connectionInfo\" should not be null";
+
+		URI uri = UriBuilder
+				.fromUri(URI_TEMPLATE)
+				.path("applications")
+				.path(name)
+				.path("subscriptioncandidates")
+				.build(this.connectionInfo.getHost(),
+						this.connectionInfo.getAccount());
+
+		Response response = null;
+
+		try {
+			response = this.invokeService(uri, HttpMethod.GET);
+
+			List<String> consumerAccounts = response
+					.readEntity(new GenericType<List<String>>() {
+					});
+
+			return Collections.unmodifiableList(consumerAccounts);
+		} finally {
+			if (response != null) {
+				response.close();
+			}
+		}
+
 	}
 
-	public void stopApplication(final String name) {
-		this.doInvokeApplicationAction(name, "STOP");
+	public boolean restartApplication(final String name) {
+		return this.doInvokeApplicationAction(name, "RESTART");
 	}
 
-	private Html5Application doCreateApplication(final String name,
+	public boolean startApplication(final String name) {
+		return this.doInvokeApplicationAction(name, "START");
+	}
+
+	public boolean stopApplication(final String name) {
+		return this.doInvokeApplicationAction(name, "STOP");
+	}
+
+	private Application doCreateApplication(final String name,
 			final String displayName, final String repository,
 			boolean cloudRepository) {
 		if (name == null) {
@@ -426,7 +768,7 @@ public final class Html5ApplicationService {
 				.build(this.connectionInfo.getHost(),
 						this.connectionInfo.getAccount());
 
-		Html5ApplicationImpl application = new Html5ApplicationImpl();
+		ApplicationImpl application = new ApplicationImpl();
 
 		application.setName(name);
 		application.setDisplayName(displayName);
@@ -460,10 +802,12 @@ public final class Html5ApplicationService {
 					.build(this.connectionInfo.getHost(),
 							this.connectionInfo.getAccount());
 
+			response = null;
+
 			try {
 				response = this.invokeService(uri, HttpMethod.GET);
 
-				return response.readEntity(Html5ApplicationImpl.class);
+				return response.readEntity(ApplicationImpl.class);
 			} finally {
 				if (response != null) {
 					response.close();
@@ -524,7 +868,7 @@ public final class Html5ApplicationService {
 		}
 	}
 
-	private void doInvokeApplicationAction(final String name,
+	private boolean doInvokeApplicationAction(final String name,
 			final String action) {
 		if (name == null) {
 			throw new NullPointerException("\"name\" is null");
@@ -563,6 +907,8 @@ public final class Html5ApplicationService {
 		try {
 			response = this.invokeService(uri, HttpMethod.POST,
 					Entity.entity(action, MediaType.APPLICATION_JSON));
+
+			return Status.OK == Status.fromStatusCode(response.getStatus());
 		} finally {
 			if (response != null) {
 				response.close();
