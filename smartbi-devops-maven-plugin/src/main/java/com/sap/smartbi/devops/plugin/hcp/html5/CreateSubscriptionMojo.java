@@ -17,6 +17,9 @@ public final class CreateSubscriptionMojo extends AbstractApplicationMojo {
 	@Parameter(property = APPLICATION_PROPERTY, required = true)
 	private String application;
 
+	@Parameter(property = DISPATCHER_PROPERTY, required = true)
+	private String dispatcher;
+
 	@Parameter(property = HOST_PROPERTY, required = true)
 	private String host;
 
@@ -41,15 +44,15 @@ public final class CreateSubscriptionMojo extends AbstractApplicationMojo {
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		Html5ApplicationService service = this.createHtml5ApplicationService(
-				this.host, this.account, this.user, this.password,
-				this.proxyHost, this.proxyPort);
+				this.dispatcher, this.host, this.account, this.user,
+				this.password, this.proxyHost, this.proxyPort);
 
 		this.getLog()
 				.info(String
-						.format("Subscribing to HTML5 application\n\tsubscription: %1$s\n\tapplication: %2$s\n\tprovider account: %3$s\n\taccount: %4$s\n\thost: %5$s\n\tuser: %6$s\n",
+						.format("Subscribing to HTML5 application\n\tsubscription: %1$s\n\tapplication: %2$s\n\tprovider account: %3$s\n\tdispatcher: %4$s\n\taccount: %5$s\n\thost: %6$s\n\tuser: %7$s\n",
 								this.subscription, this.application,
-								this.providerAccount, this.account, this.host,
-								this.user));
+								this.providerAccount, this.dispatcher,
+								this.account, this.host, this.user));
 
 		try {
 			Subscription subscription = service.createSubscription(
@@ -81,6 +84,11 @@ public final class CreateSubscriptionMojo extends AbstractApplicationMojo {
 
 	public void setApplication(final String application) {
 		this.application = application;
+	}
+
+	@Override
+	public void setDispatcher(final String dispatcher) {
+		this.dispatcher = dispatcher;
 	}
 
 	@Override

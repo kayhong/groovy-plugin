@@ -20,6 +20,9 @@ public final class DeleteSubscriptionCandidateMojo extends
 	@Parameter(property = CONSUMER_ACCOUNT_PROPERTY)
 	private String consumerAccount;
 
+	@Parameter(property = DISPATCHER_PROPERTY, required = true)
+	private String dispatcher;
+
 	@Parameter(property = HOST_PROPERTY, required = true)
 	private String host;
 
@@ -38,24 +41,28 @@ public final class DeleteSubscriptionCandidateMojo extends
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		Html5ApplicationService service = this.createHtml5ApplicationService(
-				this.host, this.account, this.user, this.password,
-				this.proxyHost, this.proxyPort);
+				this.dispatcher, this.host, this.account, this.user,
+				this.password, this.proxyHost, this.proxyPort);
 
 		this.getLog()
 				.info(String
-						.format("Deleting subscription candidate for HTML5 application:\n\tapplication: %1$s\n\taccount: %2$s\n\tconsumer account: %3$s\n\thost: %4$s\n\tuser: %5$s\n",
+						.format("Deleting subscription candidate for HTML5 application:\n\tapplication: %1$s\n\taccount: %2$s\n\tconsumer account: %3$s\n\tdispatcher: %4$s\n\thost: %5$s\n\tuser: %6$s\n",
 								this.application, this.account,
-								this.consumerAccount, this.host, this.user));
+								this.consumerAccount, this.dispatcher,
+								this.host, this.user));
 
 		try {
-			if (service.deleteSubscriptionCandidate(this.application, this.consumerAccount)) {
+			if (service.deleteSubscriptionCandidate(this.application,
+					this.consumerAccount)) {
 				this.getLog()
-				.info("Successfully deleted subscription candidate for HTML5 application\n");
+						.info("Successfully deleted subscription candidate for HTML5 application\n");
 			} else {
-				this.getLog().info("Could not delete subscription candidate for HTML5 application\n");
+				this.getLog()
+						.info("Could not delete subscription candidate for HTML5 application\n");
 			}
 		} catch (RuntimeException e) {
-			this.getLog().error("Failed to delete subscription candidate for HTML5 application\n");
+			this.getLog()
+					.error("Failed to delete subscription candidate for HTML5 application\n");
 
 			throw new MojoExecutionException(
 					String.format(
@@ -72,6 +79,11 @@ public final class DeleteSubscriptionCandidateMojo extends
 
 	public void setConsumerAccount(final String consumerAccount) {
 		this.consumerAccount = consumerAccount;
+	}
+
+	@Override
+	public void setDispatcher(final String dispatcher) {
+		this.dispatcher = dispatcher;
 	}
 
 	@Override

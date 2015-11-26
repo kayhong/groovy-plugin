@@ -9,9 +9,9 @@ import org.apache.maven.plugin.MojoExecutionException;
 import com.sap.smartbi.devops.hcp.models.html5.HcpConnectionInfo;
 import com.sap.smartbi.devops.hcp.services.Html5ApplicationService;
 
-public abstract class AbstractApplicationMojo extends AbstractMojo
-		implements IHcpMojo {
-	
+public abstract class AbstractApplicationMojo extends AbstractMojo implements
+		IHcpMojo {
+
 	protected final static String ACCOUNT_PROPERTY = "account";
 	protected final static String APPLICATION_PROPERTY = "application";
 	protected final static String CLOUD_REPOSITORY_PROPERTY = "cloudRepository";
@@ -19,6 +19,7 @@ public abstract class AbstractApplicationMojo extends AbstractMojo
 	protected final static String CONTENT_PROPERTY = "content";
 	protected final static String DELETE_REPOSITORY_PROPERTY = "deleteRepository";
 	protected final static String DELETE_SUBSCRIPTIONS_PROPERTY = "deleteSubscriptions";
+	protected final static String DISPATCHER_PROPERTY = "dispatcher";
 	protected final static String DISPLAY_NAME_PROPERTY = "displayName";
 	protected final static String HOST_PROPERTY = "host";
 	protected final static String PASSWORD_PROPERTY = "password";
@@ -31,8 +32,11 @@ public abstract class AbstractApplicationMojo extends AbstractMojo
 	protected final static String VERSION_PROPERTY = "version";
 
 	protected Html5ApplicationService createHtml5ApplicationService(
-			final String host, final String account, final String userName,
-			final String password, final String proxyHost, int proxyPort) throws MojoExecutionException {
+			final String dispatcher, final String host, final String account,
+			final String userName, final String password,
+			final String proxyHost, int proxyPort)
+			throws MojoExecutionException {
+		assert dispatcher != null : "\"dispatcher\" should not be null";
 		assert host != null : "\"host\" should not be null";
 		assert account != null : "\"account\" should not be null";
 		assert userName != null : "\"userName\" should not be null";
@@ -51,6 +55,7 @@ public abstract class AbstractApplicationMojo extends AbstractMojo
 			}
 		}
 
-		return Html5ApplicationService.getInstance(new HcpConnectionInfo(host, account, userName, password, proxyUri));
+		return Html5ApplicationService.getInstance(new HcpConnectionInfo(
+				dispatcher, host, account, userName, password, proxyUri));
 	}
 }

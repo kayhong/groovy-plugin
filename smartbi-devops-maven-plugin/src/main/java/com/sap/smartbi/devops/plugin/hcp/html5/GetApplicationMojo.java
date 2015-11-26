@@ -17,6 +17,9 @@ public final class GetApplicationMojo extends AbstractApplicationMojo {
 	@Parameter(property = APPLICATION_PROPERTY, required = true)
 	private String application;
 
+	@Parameter(property = DISPATCHER_PROPERTY, required = true)
+	private String dispatcher;
+
 	@Parameter(property = HOST_PROPERTY, required = true)
 	private String host;
 
@@ -35,14 +38,14 @@ public final class GetApplicationMojo extends AbstractApplicationMojo {
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		Html5ApplicationService service = this.createHtml5ApplicationService(
-				this.host, this.account, this.user, this.password,
-				this.proxyHost, this.proxyPort);
+				this.dispatcher, this.host, this.account, this.user,
+				this.password, this.proxyHost, this.proxyPort);
 
 		this.getLog()
 				.info(String
-						.format("Retrieving HTML5 application details:\n\tapplication: %1$s\n\taccount: %2$s\n\thost: %3$s\n\tuser: %4$s\n",
-								this.application, this.account, this.host,
-								this.user));
+						.format("Retrieving HTML5 application details:\n\tapplication: %1$s\n\taccount: %2$s\n\tdispatcher: %3$s\n\thost: %4$s\n\tuser: %5$s\n",
+								this.application, this.account,
+								this.dispatcher, this.host, this.user));
 
 		try {
 			Application application = service.getApplication(this.application);
@@ -80,6 +83,11 @@ public final class GetApplicationMojo extends AbstractApplicationMojo {
 
 	public void setApplication(final String application) {
 		this.application = application;
+	}
+
+	@Override
+	public void setDispatcher(final String dispatcher) {
+		this.dispatcher = dispatcher;
 	}
 
 	@Override

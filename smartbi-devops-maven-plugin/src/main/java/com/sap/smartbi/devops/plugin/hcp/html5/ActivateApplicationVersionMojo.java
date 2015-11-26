@@ -17,6 +17,9 @@ public final class ActivateApplicationVersionMojo extends
 	@Parameter(property = APPLICATION_PROPERTY, required = true)
 	private String application;
 
+	@Parameter(property = DISPATCHER_PROPERTY, required = true)
+	private String dispatcher;
+
 	@Parameter(property = HOST_PROPERTY, required = true)
 	private String host;
 
@@ -38,14 +41,15 @@ public final class ActivateApplicationVersionMojo extends
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		Html5ApplicationService service = this.createHtml5ApplicationService(
-				this.host, this.account, this.user, this.password,
-				this.proxyHost, this.proxyPort);
+				this.dispatcher, this.host, this.account, this.user,
+				this.password, this.proxyHost, this.proxyPort);
 
 		this.getLog()
 				.info(String
-						.format("Activating HTML5 application version:\n\tapplication: %1$s\n\taccount: %2$s\n\thost: %3$s\n\tuser: %4$s\n\tversion: %5$s\n",
-								this.application, this.account, this.host,
-								this.user, this.version));
+						.format("Activating HTML5 application version:\n\tapplication: %1$s\n\taccount: %2$s\n\tdispatcher: %3$s\n\thost: %4$s\n\tuser: %5$s\n\tversion: %6$s\n",
+								this.application, this.account,
+								this.dispatcher, this.host, this.user,
+								this.version));
 
 		try {
 			service.activateApplicationVersion(this.application, this.version);
@@ -72,9 +76,14 @@ public final class ActivateApplicationVersionMojo extends
 	public void setAccount(final String account) {
 		this.account = account;
 	}
-	
+
 	public void setApplication(final String application) {
 		this.application = application;
+	}
+
+	@Override
+	public void setDispatcher(final String dispatcher) {
+		this.dispatcher = dispatcher;
 	}
 
 	@Override

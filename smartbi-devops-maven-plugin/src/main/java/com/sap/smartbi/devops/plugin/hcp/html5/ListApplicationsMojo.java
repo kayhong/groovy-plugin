@@ -11,11 +11,13 @@ import com.sap.smartbi.devops.hcp.models.html5.Application;
 import com.sap.smartbi.devops.hcp.services.Html5ApplicationService;
 
 @Mojo(name = "list-html5-applications")
-public final class ListApplicationsMojo extends
-		AbstractApplicationMojo {
+public final class ListApplicationsMojo extends AbstractApplicationMojo {
 
 	@Parameter(property = ACCOUNT_PROPERTY, required = true)
 	private String account;
+
+	@Parameter(property = DISPATCHER_PROPERTY, required = true)
+	private String dispatcher;
 
 	@Parameter(property = HOST_PROPERTY, required = true)
 	private String host;
@@ -35,17 +37,17 @@ public final class ListApplicationsMojo extends
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		Html5ApplicationService service = this.createHtml5ApplicationService(
-				this.host, this.account, this.user, this.password,
-				this.proxyHost, this.proxyPort);
+				this.dispatcher, this.host, this.account, this.user,
+				this.password, this.proxyHost, this.proxyPort);
 
 		this.getLog()
 				.info(String
-						.format("Retrieving HTML5 applications:\n\taccount: %1$s\n\thost: %2$s\n\tuser: %3$s\n",
-								this.account, this.host, this.user));
+						.format("Retrieving HTML5 applications:\n\taccount: %1$s\n\tdispatcher: %2$s\n\thost: %3$s\n\tuser: %4$s\n",
+								this.account, this.dispatcher, this.host,
+								this.user));
 
 		try {
-			Collection<Application> applications = service
-					.listApplications();
+			Collection<Application> applications = service.listApplications();
 
 			this.getLog().info("Successfully retrieved HTML5 applications\n");
 
@@ -74,6 +76,11 @@ public final class ListApplicationsMojo extends
 	@Override
 	public void setAccount(final String account) {
 		this.account = account;
+	}
+
+	@Override
+	public void setDispatcher(final String dispatcher) {
+		this.dispatcher = dispatcher;
 	}
 
 	@Override

@@ -11,14 +11,16 @@ import org.apache.maven.plugins.annotations.Parameter;
 import com.sap.smartbi.devops.hcp.services.Html5ApplicationService;
 
 @Mojo(name = "import-html5-application-content")
-public final class ImportApplicationContentMojo extends
-		AbstractApplicationMojo {
+public final class ImportApplicationContentMojo extends AbstractApplicationMojo {
 
 	@Parameter(property = ACCOUNT_PROPERTY, required = true)
 	private String account;
 
 	@Parameter(property = CONTENT_PROPERTY, required = true)
 	private File content;
+
+	@Parameter(property = DISPATCHER_PROPERTY, required = true)
+	private String dispatcher;
 
 	@Parameter(property = HOST_PROPERTY, required = true)
 	private String host;
@@ -44,13 +46,13 @@ public final class ImportApplicationContentMojo extends
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		Html5ApplicationService service = this.createHtml5ApplicationService(
-				this.host, this.account, this.user, this.password,
-				this.proxyHost, this.proxyPort);
+				this.dispatcher, this.host, this.account, this.user,
+				this.password, this.proxyHost, this.proxyPort);
 
 		this.getLog()
 				.info(String
-						.format("Importing HTML5 application content:\n\tapplication: %1$s\n\taccount: %2$s\n\thost: %3$s\n\tuser: %4$s\n\tversion: %5$s\n\tcontent source:%6$s\n",
-								this.application, this.account, this.host,
+						.format("Importing HTML5 application content:\n\tapplication: %1$s\n\taccount: %2$s\n\tdispatcher: %3$s\n\thost: %4$s\n\tuser: %5$s\n\tversion: %6$s\n\tcontent source:%7$s\n",
+								this.application, this.account, this.dispatcher, this.host,
 								this.user, this.version,
 								this.content.getAbsolutePath()));
 
@@ -101,6 +103,11 @@ public final class ImportApplicationContentMojo extends
 
 	public void setContent(final File content) {
 		this.content = content;
+	}
+
+	@Override
+	public void setDispatcher(final String dispatcher) {
+		this.dispatcher = dispatcher;
 	}
 
 	@Override

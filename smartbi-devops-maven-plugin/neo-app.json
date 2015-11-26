@@ -1,0 +1,20 @@
+{
+   "authenticationMethod" : "saml",
+   "logoutPage" : "/logout.html",
+   "sendWelcomeFileRedirect" : false,
+   "routes" : [ {
+      "description" : "some description",
+      "path" : "/path",
+      "target" : {
+         "name" : "some-name",
+         "entryPath" : "/subpath",
+         "type" : "destination",
+         "version" : "0.0.1"
+      }
+   } ],
+   "securityConstraints" : [ {
+      "permission" : "use application",
+      "protectedPaths" : [ "path1", "path2" ]
+   } ],
+   "welcomeFile" : "/path/index.html"
+}

@@ -9,8 +9,7 @@ import com.sap.smartbi.devops.hcp.models.html5.Application;
 import com.sap.smartbi.devops.hcp.services.Html5ApplicationService;
 
 @Mojo(name = "create-html5-application")
-public final class CreateApplicationMojo extends
-		AbstractApplicationMojo {
+public final class CreateApplicationMojo extends AbstractApplicationMojo {
 
 	@Parameter(property = ACCOUNT_PROPERTY, required = true)
 	private String account;
@@ -20,6 +19,9 @@ public final class CreateApplicationMojo extends
 
 	@Parameter(property = CLOUD_REPOSITORY_PROPERTY, defaultValue = "true")
 	private boolean cloudRepository;
+
+	@Parameter(property = DISPATCHER_PROPERTY, required = true)
+	private String dispatcher;
 
 	@Parameter(property = DISPLAY_NAME_PROPERTY)
 	private String displayName;
@@ -46,18 +48,19 @@ public final class CreateApplicationMojo extends
 	public void execute() throws MojoExecutionException, MojoFailureException {
 
 		Html5ApplicationService service = this.createHtml5ApplicationService(
-				this.host, this.account, this.user, this.password,
-				this.proxyHost, this.proxyPort);
+				this.dispatcher, this.host, this.account, this.user,
+				this.password, this.proxyHost, this.proxyPort);
 
 		this.getLog()
 				.info(String
-						.format("Creating HTML5 application:\n\tapplication: %1$s\n\taccount: %2$s\n\thost: %3$s\n\tuser: %4$s\n",
-								this.application, this.account, this.host,
-								this.user));
+						.format("Creating HTML5 application:\n\tapplication: %1$s\n\taccount: %2$s\n\tdispatcher: %3$\n\tshost: %4$s\n\tuser: %5$s\n",
+								this.application, this.account,
+								this.dispatcher, this.host, this.user));
 
 		try {
-			Application application = service.createApplication(this.application,
-					this.displayName, this.repository, this.cloudRepository);
+			Application application = service.createApplication(
+					this.application, this.displayName, this.repository,
+					this.cloudRepository);
 
 			this.getLog()
 					.info(String
@@ -86,6 +89,10 @@ public final class CreateApplicationMojo extends
 
 	public void setApplication(final String application) {
 		this.application = application;
+	}
+
+	public void setDispatcher(final String dispatcher) {
+		this.dispatcher = dispatcher;
 	}
 
 	public void setDisplayName(final String displayName) {

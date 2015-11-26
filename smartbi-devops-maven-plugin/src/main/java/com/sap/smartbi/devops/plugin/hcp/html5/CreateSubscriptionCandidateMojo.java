@@ -20,6 +20,9 @@ public final class CreateSubscriptionCandidateMojo extends
 	@Parameter(property = CONSUMER_ACCOUNT_PROPERTY, required = true)
 	private String consumerAccount;
 
+	@Parameter(property = DISPATCHER_PROPERTY, required = true)
+	private String dispatcher;
+
 	@Parameter(property = HOST_PROPERTY, required = true)
 	private String host;
 
@@ -38,14 +41,15 @@ public final class CreateSubscriptionCandidateMojo extends
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		Html5ApplicationService service = this.createHtml5ApplicationService(
-				this.host, this.account, this.user, this.password,
-				this.proxyHost, this.proxyPort);
+				this.dispatcher, this.host, this.account, this.user,
+				this.password, this.proxyHost, this.proxyPort);
 
 		this.getLog()
 				.info(String
-						.format("Creating subscription candidate for HTML5 application:\n\tapplication: %1$s\n\taccount: %2$s\n\tconsumer account: %3$s\n\thost: %4$s\n\tuser: %5$s\n",
+						.format("Creating subscription candidate for HTML5 application:\n\tapplication: %1$s\n\taccount: %2$s\n\tconsumer account: %3$s\n\tdispatcher: %4$\n\tshost: %5$s\n\tuser: %6$s\n",
 								this.application, this.account,
-								this.consumerAccount, this.host, this.user));
+								this.consumerAccount, this.dispatcher,
+								this.host, this.user));
 
 		try {
 			if (service.createSubscriptionCandidate(this.application,
@@ -75,6 +79,12 @@ public final class CreateSubscriptionCandidateMojo extends
 
 	public void setConsumerAccount(final String consumerAccount) {
 		this.consumerAccount = consumerAccount;
+	}
+
+	@Override
+	public void setDispatcher(final String dispatcher)
+	{
+		this.dispatcher = dispatcher;
 	}
 
 	@Override

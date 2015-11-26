@@ -8,14 +8,16 @@ import org.apache.maven.plugins.annotations.Parameter;
 import com.sap.smartbi.devops.hcp.services.Html5ApplicationService;
 
 @Mojo(name = "start-html5-application")
-public final class StartApplicationMojo extends
-		AbstractApplicationMojo {
+public final class StartApplicationMojo extends AbstractApplicationMojo {
 
 	@Parameter(property = ACCOUNT_PROPERTY, required = true)
 	private String account;
 
 	@Parameter(property = APPLICATION_PROPERTY, required = true)
 	private String application;
+
+	@Parameter(property = DISPATCHER_PROPERTY, required = true)
+	private String dispatcher;
 
 	@Parameter(property = HOST_PROPERTY, required = true)
 	private String host;
@@ -35,14 +37,14 @@ public final class StartApplicationMojo extends
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		Html5ApplicationService service = this.createHtml5ApplicationService(
-				this.host, this.account, this.user, this.password,
-				this.proxyHost, this.proxyPort);
+				this.dispatcher, this.host, this.account, this.user,
+				this.password, this.proxyHost, this.proxyPort);
 
 		this.getLog()
 				.info(String
-						.format("Starting HTML5 application:\n\tapplication: %1$s\n\taccount: %2$s\n\thost: %3$s\n\tuser: %4$s\n",
-								this.application, this.account, this.host,
-								this.user));
+						.format("Starting HTML5 application:\n\tapplication: %1$s\n\taccount: %2$s\n\tdispatcher: %3$s\n\thost: %4$s\n\tuser: %5$s\n",
+								this.application, this.account,
+								this.dispatcher, this.host, this.user));
 
 		try {
 			service.startApplication(this.application);
@@ -72,6 +74,11 @@ public final class StartApplicationMojo extends
 
 	public void setApplication(final String application) {
 		this.application = application;
+	}
+
+	@Override
+	public void setDispatcher(final String dispatcher) {
+		this.dispatcher = dispatcher;
 	}
 
 	@Override

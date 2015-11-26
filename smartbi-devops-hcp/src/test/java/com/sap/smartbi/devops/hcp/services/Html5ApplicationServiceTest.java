@@ -44,6 +44,7 @@ public final class Html5ApplicationServiceTest {
 			}
 		}
 
+		String dispatcher = properties.getProperty("dispatcher");
 		String host = properties.getProperty("host");
 		String account = properties.getProperty("account");
 		String consumerAccount = properties.getProperty("consumer.account");
@@ -51,11 +52,12 @@ public final class Html5ApplicationServiceTest {
 		String password = properties.getProperty("password");
 		String proxyUri = properties.getProperty("proxy.uri");
 
-		CONNECTION_INFO = new HcpConnectionInfo(host, account, user, password,
-				proxyUri == null ? null : URI.create(proxyUri));
-
-		CONSUMER_CONNECTION_INFO = new HcpConnectionInfo(host, consumerAccount,
+		CONNECTION_INFO = new HcpConnectionInfo(dispatcher, host, account,
 				user, password, proxyUri == null ? null : URI.create(proxyUri));
+
+		CONSUMER_CONNECTION_INFO = new HcpConnectionInfo(dispatcher, host,
+				consumerAccount, user, password, proxyUri == null ? null
+						: URI.create(proxyUri));
 	}
 
 	@Test

@@ -8,8 +8,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import com.sap.smartbi.devops.hcp.services.Html5ApplicationService;
 
 @Mojo(name = "delete-html5-application")
-public final class DeleteApplicationMojo extends
-		AbstractApplicationMojo {
+public final class DeleteApplicationMojo extends AbstractApplicationMojo {
 
 	@Parameter(property = ACCOUNT_PROPERTY, required = true)
 	private String account;
@@ -22,6 +21,9 @@ public final class DeleteApplicationMojo extends
 
 	@Parameter(property = DELETE_SUBSCRIPTIONS_PROPERTY, defaultValue = "true")
 	private boolean deleteSubscriptions;
+
+	@Parameter(property = DISPATCHER_PROPERTY, required = true)
+	private String dispatcher;
 
 	@Parameter(property = HOST_PROPERTY, required = true)
 	private String host;
@@ -41,15 +43,15 @@ public final class DeleteApplicationMojo extends
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		Html5ApplicationService service = this.createHtml5ApplicationService(
-				this.host, this.account, this.user, this.password,
-				this.proxyHost, this.proxyPort);
+				this.dispatcher, this.host, this.account, this.user,
+				this.password, this.proxyHost, this.proxyPort);
 
 		this.getLog()
 				.info(String
-						.format("Deleting HTML5 application:\n\tapplication: %1$s\n\taccount: %2$s\n\thost: %3$s\n\tuser: %4$s\n\tdelete repository: %5$s\n\tdelete subscriptions: %6$s\n",
-								this.application, this.account, this.host,
-								this.user, this.deleteRepository,
-								this.deleteSubscriptions));
+						.format("Deleting HTML5 application:\n\tapplication: %1$s\n\taccount: %2$s\n\tdispatcher: %3$s\n\thost: %4$s\n\tuser: %5$s\n\tdelete repository: %6$s\n\tdelete subscriptions: %7$s\n",
+								this.application, this.account,
+								this.dispatcher, this.host, this.user,
+								this.deleteRepository, this.deleteSubscriptions));
 
 		try {
 			service.deleteApplication(this.application, this.deleteRepository,
@@ -60,10 +62,10 @@ public final class DeleteApplicationMojo extends
 							.format("Successfully deleted the \"%1$s\" HTML5 application\n",
 									this.application));
 		} catch (RuntimeException e) {
-			this.getLog().error(
-					String.format(
-							"Failed to delete the \"%1$s\" HTML5 application\n",
-							this.application));
+			this.getLog()
+					.error(String
+							.format("Failed to delete the \"%1$s\" HTML5 application\n",
+									this.application));
 
 			throw new MojoExecutionException(
 					String.format(
@@ -87,6 +89,11 @@ public final class DeleteApplicationMojo extends
 
 	public void setDeleteSubscriptions(boolean deleteSubscriptions) {
 		this.deleteSubscriptions = deleteSubscriptions;
+	}
+
+	@Override
+	public void setDispatcher(final String dispatcher) {
+		this.dispatcher = dispatcher;
 	}
 
 	@Override

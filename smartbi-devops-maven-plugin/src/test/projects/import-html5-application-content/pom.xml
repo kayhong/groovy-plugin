@@ -14,6 +14,7 @@
 				<groupId>com.sap.smartbi.devops</groupId>
 				<artifactId>smartbi-devops-maven-plugin</artifactId>
 				<configuration>
+					<dispatcher>dispatcher</dispatcher>
 					<host>neo.ondemand.com</host>
 					<account>x389dec7d</account>
 					<user>P1941054458</user>

@@ -13,6 +13,9 @@ public final class DeleteSubscriptionMojo extends AbstractApplicationMojo {
 	@Parameter(property = ACCOUNT_PROPERTY, required = true)
 	private String account;
 
+	@Parameter(property = DISPATCHER_PROPERTY, required = true)
+	private String dispatcher;
+
 	@Parameter(property = HOST_PROPERTY, required = true)
 	private String host;
 
@@ -34,14 +37,14 @@ public final class DeleteSubscriptionMojo extends AbstractApplicationMojo {
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		Html5ApplicationService service = this.createHtml5ApplicationService(
-				this.host, this.account, this.user, this.password,
-				this.proxyHost, this.proxyPort);
+				this.dispatcher, this.host, this.account, this.user,
+				this.password, this.proxyHost, this.proxyPort);
 
 		this.getLog()
 				.info(String
-						.format("Unsubscribing from HTML5 application:\n\tsubscription name: %1$s\n\taccount: %2$s\n\thost: %3$s\n\tuser: %4$s\n",
-								this.subscription, this.account, this.host,
-								this.user));
+						.format("Unsubscribing from HTML5 application:\n\tsubscription name: %1$s\n\taccount: %2$s\n\tdispatcher: %3$s\n\thost: %4$s\n\tuser: %5s\n",
+								this.subscription, this.account,
+								this.dispatcher, this.host, this.user));
 
 		try {
 			if (service.deleteSubscription(this.subscription)) {
@@ -65,6 +68,11 @@ public final class DeleteSubscriptionMojo extends AbstractApplicationMojo {
 	@Override
 	public void setAccount(final String account) {
 		this.account = account;
+	}
+
+	@Override
+	public void setDispatcher(final String dispatcher) {
+		this.dispatcher = dispatcher;
 	}
 
 	@Override

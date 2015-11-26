@@ -44,7 +44,7 @@ public final class Html5ApplicationService {
 
 	private static final String CSRF_TOKEN_HEADER_NAME = "X-CSRF-Token";
 	private static final String CSRF_TOKEN_FETCH_HEADER_VALUE = "Fetch";
-	private static final String URI_TEMPLATE = "https://dispatcher.{host}/hcproxy/b/api/accounts/{account}";
+	private static final String URI_TEMPLATE = "https://{dispatcher}.{host}/hcproxy/b/api/accounts/{account}";
 
 	private final HcpConnectionInfo connectionInfo;
 	private final Client client;
@@ -105,7 +105,8 @@ public final class Html5ApplicationService {
 				.path("versions")
 				.path(version)
 				.path("action")
-				.build(this.connectionInfo.getHost(),
+				.build(this.connectionInfo.getDispatcher(),
+						this.connectionInfo.getHost(),
 						this.connectionInfo.getAccount());
 
 		Response response = null;
@@ -171,7 +172,8 @@ public final class Html5ApplicationService {
 				.path("applications")
 				.path(name)
 				.path("versions")
-				.build(this.connectionInfo.getHost(),
+				.build(this.connectionInfo.getDispatcher(),
+						this.connectionInfo.getHost(),
 						this.connectionInfo.getAccount());
 
 		Response response = null;
@@ -221,7 +223,8 @@ public final class Html5ApplicationService {
 		URI uri = UriBuilder
 				.fromUri(URI_TEMPLATE)
 				.path("subscriptions")
-				.build(this.connectionInfo.getHost(),
+				.build(this.connectionInfo.getDispatcher(),
+						this.connectionInfo.getHost(),
 						this.connectionInfo.getAccount());
 
 		SubscriptionImpl subscription = new SubscriptionImpl();
@@ -248,7 +251,8 @@ public final class Html5ApplicationService {
 					.fromUri(URI_TEMPLATE)
 					.path("subscriptions")
 					.path(name)
-					.build(this.connectionInfo.getHost(),
+					.build(this.connectionInfo.getDispatcher(),
+							this.connectionInfo.getHost(),
 							this.connectionInfo.getAccount());
 
 			response = null;
@@ -296,7 +300,8 @@ public final class Html5ApplicationService {
 				.path(name)
 				.path("subscriptioncandidates")
 				.path(consumerAccount)
-				.build(this.connectionInfo.getHost(),
+				.build(this.connectionInfo.getDispatcher(),
+						this.connectionInfo.getHost(),
 						this.connectionInfo.getAccount());
 
 		Response response = null;
@@ -342,7 +347,8 @@ public final class Html5ApplicationService {
 				.fromUri(URI_TEMPLATE)
 				.path("subscriptions")
 				.path(name)
-				.build(this.connectionInfo.getHost(),
+				.build(this.connectionInfo.getDispatcher(),
+						this.connectionInfo.getHost(),
 						this.connectionInfo.getAccount());
 
 		Response response = null;
@@ -385,7 +391,8 @@ public final class Html5ApplicationService {
 				.path(name)
 				.path("subscriptioncandidates")
 				.path(consumerAccount)
-				.build(this.connectionInfo.getHost(),
+				.build(this.connectionInfo.getDispatcher(),
+						this.connectionInfo.getHost(),
 						this.connectionInfo.getAccount());
 
 		Response response = null;
@@ -417,7 +424,8 @@ public final class Html5ApplicationService {
 				.fromUri(URI_TEMPLATE)
 				.path("applications")
 				.path(name)
-				.build(this.connectionInfo.getHost(),
+				.build(this.connectionInfo.getDispatcher(),
+						this.connectionInfo.getHost(),
 						this.connectionInfo.getAccount());
 
 		Response response = null;
@@ -448,7 +456,8 @@ public final class Html5ApplicationService {
 				.fromUri(URI_TEMPLATE)
 				.path("subscriptions")
 				.path(name)
-				.build(this.connectionInfo.getHost(),
+				.build(this.connectionInfo.getDispatcher(),
+						this.connectionInfo.getHost(),
 						this.connectionInfo.getAccount());
 
 		Response response = null;
@@ -490,7 +499,8 @@ public final class Html5ApplicationService {
 				.path(name)
 				.path("subscriptioncandidates")
 				.path(consumerAccount)
-				.build(this.connectionInfo.getHost(),
+				.build(this.connectionInfo.getDispatcher(),
+						this.connectionInfo.getHost(),
 						this.connectionInfo.getAccount());
 
 		Response response = null;
@@ -562,7 +572,8 @@ public final class Html5ApplicationService {
 				.path("versions")
 				.path(version)
 				.path("content")
-				.build(this.connectionInfo.getHost(),
+				.build(this.connectionInfo.getDispatcher(),
+						this.connectionInfo.getHost(),
 						this.connectionInfo.getAccount());
 
 		Response response = null;
@@ -596,7 +607,8 @@ public final class Html5ApplicationService {
 				.path("applications")
 				.path(name)
 				.path("commits")
-				.build(this.connectionInfo.getHost(),
+				.build(this.connectionInfo.getDispatcher(),
+						this.connectionInfo.getHost(),
 						this.connectionInfo.getAccount());
 
 		Response response = null;
@@ -620,7 +632,8 @@ public final class Html5ApplicationService {
 		URI uri = UriBuilder
 				.fromUri(URI_TEMPLATE)
 				.path("applications")
-				.build(this.connectionInfo.getHost(),
+				.build(this.connectionInfo.getDispatcher(),
+						this.connectionInfo.getHost(),
 						this.connectionInfo.getAccount());
 
 		Response response = null;
@@ -656,7 +669,8 @@ public final class Html5ApplicationService {
 				.path("applications")
 				.path(name)
 				.path("versions")
-				.build(this.connectionInfo.getHost(),
+				.build(this.connectionInfo.getDispatcher(),
+						this.connectionInfo.getHost(),
 						this.connectionInfo.getAccount());
 
 		Response response = null;
@@ -680,7 +694,8 @@ public final class Html5ApplicationService {
 		URI uri = UriBuilder
 				.fromUri(URI_TEMPLATE)
 				.path("subscriptions")
-				.build(this.connectionInfo.getHost(),
+				.build(this.connectionInfo.getDispatcher(),
+						this.connectionInfo.getHost(),
 						this.connectionInfo.getAccount());
 
 		Response response = null;
@@ -716,7 +731,8 @@ public final class Html5ApplicationService {
 				.path("applications")
 				.path(name)
 				.path("subscriptioncandidates")
-				.build(this.connectionInfo.getHost(),
+				.build(this.connectionInfo.getDispatcher(),
+						this.connectionInfo.getHost(),
 						this.connectionInfo.getAccount());
 
 		Response response = null;
@@ -765,7 +781,8 @@ public final class Html5ApplicationService {
 		URI uri = UriBuilder
 				.fromUri(URI_TEMPLATE)
 				.path("applications")
-				.build(this.connectionInfo.getHost(),
+				.build(this.connectionInfo.getDispatcher(),
+						this.connectionInfo.getHost(),
 						this.connectionInfo.getAccount());
 
 		ApplicationImpl application = new ApplicationImpl();
@@ -799,7 +816,8 @@ public final class Html5ApplicationService {
 					.fromUri(URI_TEMPLATE)
 					.path("applications")
 					.path(name)
-					.build(this.connectionInfo.getHost(),
+					.build(this.connectionInfo.getDispatcher(),
+							this.connectionInfo.getHost(),
 							this.connectionInfo.getAccount());
 
 			response = null;
@@ -834,7 +852,8 @@ public final class Html5ApplicationService {
 				.path(name)
 				.queryParam("withRepository", deleteRepository)
 				.queryParam("withSubscriptions", deleteSubscriptions)
-				.build(this.connectionInfo.getHost(),
+				.build(this.connectionInfo.getDispatcher(),
+						this.connectionInfo.getHost(),
 						this.connectionInfo.getAccount());
 
 		Response response = null;
@@ -899,7 +918,8 @@ public final class Html5ApplicationService {
 				.path("applications")
 				.path(name)
 				.path("action")
-				.build(this.connectionInfo.getHost(),
+				.build(this.connectionInfo.getDispatcher(),
+						this.connectionInfo.getHost(),
 						this.connectionInfo.getAccount());
 
 		Response response = null;
@@ -943,7 +963,8 @@ public final class Html5ApplicationService {
 				URI fakeUri = UriBuilder
 						.fromUri(URI_TEMPLATE)
 						.path("applications")
-						.build(this.connectionInfo.getHost(),
+						.build(this.connectionInfo.getDispatcher(),
+								this.connectionInfo.getHost(),
 								this.connectionInfo.getAccount());
 
 				Response fakeResponse = null;
