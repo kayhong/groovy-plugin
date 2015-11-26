@@ -46,7 +46,7 @@ public final class CreateSubscriptionCandidateMojo extends
 
 		this.getLog()
 				.info(String
-						.format("Creating subscription candidate for HTML5 application:\n\tapplication: %1$s\n\taccount: %2$s\n\tconsumer account: %3$s\n\tdispatcher: %4$\n\tshost: %5$s\n\tuser: %6$s\n",
+						.format("Creating subscription candidate for HTML5 application:\n\tapplication: %1$s\n\taccount: %2$s\n\tconsumer account: %3$s\n\tdispatcher: %4$s\n\thost: %5$s\n\tuser: %6$s\n",
 								this.application, this.account,
 								this.consumerAccount, this.dispatcher,
 								this.host, this.user));

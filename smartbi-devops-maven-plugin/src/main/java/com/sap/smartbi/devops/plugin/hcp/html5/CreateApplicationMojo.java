@@ -53,7 +53,7 @@ public final class CreateApplicationMojo extends AbstractApplicationMojo {
 
 		this.getLog()
 				.info(String
-						.format("Creating HTML5 application:\n\tapplication: %1$s\n\taccount: %2$s\n\tdispatcher: %3$\n\tshost: %4$s\n\tuser: %5$s\n",
+						.format("Creating HTML5 application:\n\tapplication: %1$s\n\taccount: %2$s\n\tdispatcher: %3$s\n\thost: %4$s\n\tuser: %5$s\n",
 								this.application, this.account,
 								this.dispatcher, this.host, this.user));
 
