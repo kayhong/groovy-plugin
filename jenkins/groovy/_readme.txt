@@ -1,10 +1,6 @@
 // link on jenkins javadoc
+http://javadoc.jenkins-ci.org/
 
+//link to some groovy demo for jenkins
 
-// link on object model
-
-
-// link on tutorials
-
-
-// link on samples
+https://github.com/jenkinsci/jenkins-scripts/tree/master/scriptler

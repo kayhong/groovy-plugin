@@ -8,7 +8,7 @@ import hudson.model.*
 def type = FreeStyleProject.DESCRIPTOR
 
 
-
+  //a loop like **for(int i=1, i<5, i++)**in java
   for(i in 1..<5){
     
     def name = 'Old_job' + i	
@@ -16,7 +16,7 @@ def type = FreeStyleProject.DESCRIPTOR
     // http://javadoc.jenkins-ci.org/jenkins/model/Jenkins.html#createProject(hudson.model.TopLevelItemDescriptor, java.lang.String, boolean) ** the link for api createproject fonction
     
     
-    //Jenkins.instance.createProject(type , name)
+    //Jenkins.instance.createProject(type , name)   .instance to call the method getInstance.
     Jenkins.instance.createProject(type , name,true)
   }
 
