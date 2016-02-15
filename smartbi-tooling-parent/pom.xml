@@ -24,6 +24,10 @@
 		</snapshotRepository>
 	</distributionManagement>
 
+	<properties>
+		<skipTests>true</skipTests>
+	</properties>
+	
 	<modules>
 		<module>../smartbi-devops-hcp</module>
 		<module>../smartbi-devops-maven-plugin</module>
