@@ -16,13 +16,13 @@
 				<configuration>
 					<dispatcher>dispatcher</dispatcher>
 					<host>neo.ondemand.com</host>
-					<account>x389dec7d</account>
+					<account>x97bd3e38</account>
 					<user>P1941054458</user>
 					<password>Nett2014</password>
 					<proxyHost>proxy</proxyHost>
 					<proxyPort>8080</proxyPort>
 					<application>z666z</application>
-					<consumerAccount>x8505e8ba</consumerAccount>
+					<consumerAccount>xefa3ecab</consumerAccount>
 				</configuration>
 			</plugin>
 		</plugins>
