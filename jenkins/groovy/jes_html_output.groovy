@@ -6,15 +6,24 @@
 	import groovy.util.*
 	import hudson.matrix.*
 
+	
+    def build = Thread.currentThread().executable
+	def resolver = build.buildVariableResolver
+	def myJobName = resolver.resolve("jobName")
+	def myBuildNumber = Integer.parseInt(resolver.resolve("buildNumber"))
+      
+	
+
+	println "Analyse job : " + myJobName
+	println "        #   : " + myBuildNumber
 
 
-	def entryProject = Jenkins.instance.getItem("JobParent")
-	def theBuild = entryProject.getBuildByNumber(133)
+    def entryProject = Jenkins.instance.getItem(myJobName)
+	def theBuild = entryProject.getBuildByNumber(myBuildNumber)
+      
 	def upstreamCause = theBuild.getCause(Cause.UpstreamCause)
-	def build = Thread.currentThread().executable
-
+	
 	workspace = build.workspace.toString()
-
 
 	def getColor(def result){
 
@@ -49,8 +58,6 @@
 			}
 		}
 	}
-
-
 
 
 	//method to find triggered SubJobs 
@@ -655,9 +662,3 @@
 
 
 	findProjectsTree(upstreamCause, entryProject, theBuild)
-
-
-
-
-
-
