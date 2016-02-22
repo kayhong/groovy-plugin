@@ -2,6 +2,7 @@ package com.sap.smartbi.devops.hcp.services;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
@@ -9,6 +10,8 @@ import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -46,11 +49,13 @@ public final class Html5ApplicationService {
 	private static final String CSRF_TOKEN_FETCH_HEADER_VALUE = "Fetch";
 	private static final String URI_TEMPLATE = "https://{dispatcher}.{host}/hcproxy/b/api/accounts/{account}";
 
-	private final HcpConnectionInfo connectionInfo;
 	private final Client client;
+	private final HcpConnectionInfo connectionInfo;
 	private String csrfToken;
 
 	private Html5ApplicationService(final HcpConnectionInfo connectionInfo) {
+		assert connectionInfo != null : "connectionInfo should not be null";
+
 		this.connectionInfo = connectionInfo;
 
 		ClientConfig config = new ClientConfig();
@@ -547,21 +552,23 @@ public final class Html5ApplicationService {
 		File zipFile = File.createTempFile("hcp", null);
 		zipFile.deleteOnExit();
 
-		try (ZipOutputStream zipStream = new ZipOutputStream(
-				new FileOutputStream(zipFile))) {
-			for (File file : directory.listFiles()) {
-				if (file.isDirectory()) {
-					// TODO handle directories, too
-				} else {
-					String entryName = directory.toURI()
-							.relativize(file.toURI()).getPath();
+		zipDirectory(directory, zipFile);
 
-					zipStream.putNextEntry(new ZipEntry(entryName));
-
-					Files.copy(file.toPath(), zipStream);
-				}
-			}
-		}
+		// try (ZipOutputStream zipStream = new ZipOutputStream(
+		// new FileOutputStream(zipFile))) {
+		// for (File file : directory.listFiles()) {
+		// if (file.isDirectory()) {
+		// // TODO handle directories, too
+		// } else {
+		// String entryName = directory.toURI()
+		// .relativize(file.toURI()).getPath();
+		//
+		// zipStream.putNextEntry(new ZipEntry(entryName));
+		//
+		// Files.copy(file.toPath(), zipStream);
+		// }
+		// }
+		// }
 
 		assert this.connectionInfo != null : "\"this.connectionInfo\" should not be null";
 
@@ -763,6 +770,50 @@ public final class Html5ApplicationService {
 
 	public boolean stopApplication(final String name) {
 		return this.doInvokeApplicationAction(name, "STOP");
+	}
+
+	private static void zipDirectory(final File directory, final File zipFile)
+			throws FileNotFoundException, IOException {
+		assert directory != null : "\"directory\" should not be null";
+		assert zipFile != null : "\"zipFile\" should not be null";
+
+		URI baseUri = directory.toURI();
+
+		Deque<File> directories = new LinkedList<File>();
+
+		directories.push(directory);
+
+		try (FileOutputStream fileStream = new FileOutputStream(zipFile)) {
+
+			try (ZipOutputStream zipStream = new ZipOutputStream(fileStream)) {
+				while (!directories.isEmpty()) {
+					File currentDirectory = directories.pop();
+
+					for (File file : currentDirectory.listFiles()) {
+
+						String name = baseUri.relativize(file.toURI())
+								.getPath();
+
+						if (file.isDirectory()) {
+							directories.push(file);
+
+							if (!name.endsWith("/")) {
+								name = new StringBuilder(name).append('/')
+										.toString();
+							}
+
+							zipStream.putNextEntry(new ZipEntry(name));
+						} else {
+							zipStream.putNextEntry(new ZipEntry(name));
+
+							Files.copy(file.toPath(), zipStream);
+
+							zipStream.closeEntry();
+						}
+					}
+				}
+			}
+		}
 	}
 
 	private Application doCreateApplication(final String name,

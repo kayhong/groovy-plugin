@@ -653,7 +653,15 @@ public final class Html5ApplicationServiceTest {
 		try (FileWriter writer = new FileWriter(file2.toFile())) {
 			writer.write("some other content");
 		}
+		
+		Path subDirectory = Files.createDirectory(directory.resolve("sub-directory"));
+		
+		Path file3 = Files.createFile(subDirectory.resolve("file3.txt"));
 
+		try (FileWriter writer = new FileWriter(file3.toFile())) {
+			writer.write("yet another content");
+		}
+		
 		Html5ApplicationService service = Html5ApplicationService
 				.getInstance(CONNECTION_INFO);
 
