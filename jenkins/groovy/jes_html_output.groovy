@@ -44,19 +44,21 @@
 
 	def isTheSameTime(def project, def upBuild){
 		def runMap = project.builds
-		
+		boolean blnIsTheSameBuild
 		for(def o = 0; o < runMap.size(); o++){
 			def cause = runMap.get(o).getCause(Cause.UpstreamCause)
 			if(cause){
 				if(cause.getUpstreamRun() == upBuild){
 					thisBuild = runMap.get(o)
-					return true				
+					blnIsTheSameBuild = true
+					break				
 				}
 				else{
-					return false
+					blnIsTheSameBuild = false
 				}
 			}
 		}
+		return blnIsTheSameBuild
 	}
 
 
@@ -451,7 +453,7 @@
 									def configResult = configBuild.result.toString()
 									color = getColor(configResult)
 									
-									if(configRootTag)
+									if(!configRootTag)
 									configRootTag = li.appendNode("ul", [style : "list-style-type:circle"])
 
 									li = configRootTag.appendNode("li", [style : "border-style: solid; border-width: 1px"])
