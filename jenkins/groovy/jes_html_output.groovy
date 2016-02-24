@@ -28,13 +28,10 @@ def getColor(def result){
 	switch(result){
 		case "SUCCESS" :
 			return "green"
-			break
 		case "FAILURE" :
 			return "red"
-			break
 		default :
 			return "orange"
-			break
 	}
 }
 
