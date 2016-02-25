@@ -18,12 +18,11 @@ def myBuildNumber = Integer.parseInt(resolver.resolve("buildNumber"))
 println "Analyse job : " + myJobName
 println "        #   : " + myBuildNumber
 
-
-
-
 workspace = build.workspace.toString()
+outputFileFolder=workspace+"/target"
 
-def getColor(def result){
+
+  def getColor(def result){
 
 	switch(result){
 		case "SUCCESS" :
@@ -581,10 +580,11 @@ def findProjectsTree(def cause, def rootProject, def theBuild){
 
 	if(build.workspace.isRemote()){
 		def channel = build.workspace.channel
-		fp = new FilePath(channel, workspace + "/jes.html")
+      	fp = new FilePath(channel, outputFileFolder + "/jes.html")
+      
 	}
 	else{
-		fp = new FilePath(new File(workspace + "/jes.html"))
+      	fp = new FilePath(new File(outputFileFolder + "/jes.html"))
 	}
 
 	fp.write("", null)
@@ -639,12 +639,12 @@ def findProjectsTree(def cause, def rootProject, def theBuild){
 				if(configJob.builds){
 
 					if(isTheSameTime(configJob, rootRun)){
-						rootRun = thisBuild
+						def configBuild = thisBuild
 
-						def configBuildNumber = rootRun.number
-						def configBuildUrl = rootRun.properties.get("envVars")["BUILD_URL"].toString()
-						def configResult = rootRun.result.toString()
-						color = color(configResult)
+						def configBuildNumber = configBuild.number
+						def configBuildUrl = configBuild.properties.get("envVars")["BUILD_URL"].toString()
+						def configResult = configBuild.result.toString()
+						color = getColor(configResult)
 						if(!ul)
 							ul = node.appendNode("ul", [style : "list-style-type:circle"])
 
@@ -668,8 +668,8 @@ def findProjectsTree(def cause, def rootProject, def theBuild){
 								)
 
 
-						findDownstream(configJob, rootRun, li)
-						findSubJobs(configJob, rootRun, li)
+						findDownstream(configJob, configBuild, li)
+						findSubJobs(configJob, configBuild, li)
 						findSubJobs(configJob, li)
 					}
 				}
