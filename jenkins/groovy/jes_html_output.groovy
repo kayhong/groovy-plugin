@@ -625,6 +625,8 @@ def findProjectsTree(def cause, def rootProject, def theBuild){
 
 	if(rootProject instanceof MatrixProject){
 		println  "is Matrix"
+		findDownstream(rootProject, rootRun, node)
+
 		def axisList = rootProject.getAxes()
 		def ul =null
 
@@ -668,7 +670,6 @@ def findProjectsTree(def cause, def rootProject, def theBuild){
 								)
 
 
-						findDownstream(configJob, configBuild, li)
 						findSubJobs(configJob, configBuild, li)
 						findSubJobs(configJob, li)
 					}
