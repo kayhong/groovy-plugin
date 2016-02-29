@@ -72,6 +72,7 @@
 					println isTheSameTime(subProject, upBuild)
 					if(isTheSameTime(subProject, upBuild)){
 						def theBuild = thisBuild
+						def parametersNode = null
 						println theBuild
 
 						if(subProject instanceof MatrixProject){
@@ -94,7 +95,7 @@
 									def paramName = parameter.getName()
 									def paramValue = parameter.getValue()
 									if(!parametersNode){
-										def parametersNode = jobNode.appendNode("parameters")}									
+										parametersNode = jobNode.appendNode("parameters")}									
 										def parameterNode = parametersNode.appendNode("parameter")
 										parameterNode.appendNode("name", paramName)
 										parameterNode.appendNode("value", paramValue)
@@ -124,6 +125,7 @@
 												def configBuildNumber = configBuild.number
 												def configBuildUrl = configBuild.properties.get("envVars")["BUILD_URL"].toString()
 												def configResult = configBuild.result.toString()
+												parametersNode = null
 
 												def configJobNode = jobNode.appendNode("job")
 												configJobNode.appendNode("name", configJobName)
@@ -137,7 +139,7 @@
 														def paramName = parameter.getName()
 														def paramValue = parameter.getValue()
 														if(!parametersNode){
-															def parametersNode = jobNode.appendNode("parameters")}	
+															parametersNode = jobNode.appendNode("parameters")}	
 															def parameterNode = parametersNode.appendNode("parameter")
 															parameterNode.appendNode("name", paramName)
 															parameterNode.appendNode("value", paramValue)
@@ -182,7 +184,7 @@
 													def paramName = parameter.getName()
 													def paramValue = parameter.getValue()
 													if(!parametersNode){
-														def parametersNode = jobNode.appendNode("parameters")}	
+														parametersNode = jobNode.appendNode("parameters")}	
 														def parameterNode = parametersNode.appendNode("parameter")
 														parameterNode.appendNode("name", paramName)
 														parameterNode.appendNode("value", paramValue)
@@ -221,6 +223,7 @@
 							for(def j = 0; j < buildsList.size(); j++){
 
 								try{
+									def parametersNode = null
 									def subProject = buildsList.get(j).getProject()
 									println subProject
 									if(subProject instanceof MatrixProject){
@@ -242,7 +245,7 @@
 												def paramName = parameter.getName()
 												def paramValue = parameter.getValue()
 												if(!parametersNode){
-													def parametersNode = jobNode.appendNode("parameters")}	
+													parametersNode = jobNode.appendNode("parameters")}	
 													def parameterNode = parametersNode.appendNode("parameter")
 													parameterNode.appendNode("name", paramName)
 													parameterNode.appendNode("value", paramValue)
@@ -268,6 +271,7 @@
 													if(configJob.builds){
 
 														if(isTheSameTime(configJob, buildsList.get(j))){
+															parametersNode = null
 															def configBuild = thisBuild
 															def configBuildNumber = configBuild.number
 															def configBuildUrl = configBuild.properties.get("envVars")["BUILD_URL"].toString()
@@ -285,7 +289,7 @@
 																	def paramName = parameter.getName()
 																	def paramValue = parameter.getValue()
 																	if(!parametersNode){
-																		def parametersNode = jobNode.appendNode("parameters")}	
+																		parametersNode = jobNode.appendNode("parameters")}	
 																		def parameterNode = parametersNode.appendNode("parameter")
 																		parameterNode.appendNode("name", paramName)
 																		parameterNode.appendNode("value", paramValue)
@@ -320,7 +324,7 @@
 														def paramName = parameter.getName()
 														def paramValue = parameter.getValue()
 														if(!parametersNode){
-															def parametersNode = jobNode.appendNode("parameters")}	
+															parametersNode = jobNode.appendNode("parameters")}	
 															def parameterNode = parametersNode.appendNode("parameter")
 															parameterNode.appendNode("name", paramName)
 															parameterNode.appendNode("value", paramValue)
@@ -361,8 +365,10 @@
 				println isTheSameTime(dproject, build)
 				if(isTheSameTime(dproject, build)){
 					def theBuild = thisBuild
+					def parametersNode = null
 
 					if(dproject instanceof MatrixProject){
+						
 						println "is  Matrix"
 
 						def name = dproject.name
@@ -382,7 +388,7 @@
 								def paramName = parameter.getName()
 								def paramValue = parameter.getValue()
 								if(!parametersNode){
-									def parametersNode = jobNode.appendNode("parameters")}	
+									parametersNode = jobNode.appendNode("parameters")}	
 									def parameterNode = parametersNode.appendNode("parameter")
 									parameterNode.appendNode("name", paramName)
 									parameterNode.appendNode("value", paramValue)
@@ -404,6 +410,7 @@
 									if(configJob.builds){
 
 										if(isTheSameTime(configJob, theBuild)){
+											parametersNode = null
 											def configBuild = thisBuild
 											println configBuild
 											def configBuildNumber = configBuild.number
@@ -422,7 +429,7 @@
 													def paramName = parameter.getName()
 													def paramValue = parameter.getValue()
 													if(!parametersNode){
-														def parametersNode = jobNode.appendNode("parameters")}	
+														parametersNode = jobNode.appendNode("parameters")}	
 														def parameterNode = parametersNode.appendNode("parameter")
 														parameterNode.appendNode("name", paramName)
 														parameterNode.appendNode("value", paramValue)
@@ -448,6 +455,7 @@
 									println "is normal project"
 
 									if(isTheSameTime(dproject, build)){
+										
 										theBuild = thisBuild
 										def name = dproject.name
 										def url = theBuild.properties.get("envVars")["BUILD_URL"].toString()
@@ -466,7 +474,7 @@
 												def paramName = parameter.getName()
 												def paramValue = parameter.getValue()
 												if(!parametersNode){
-													def parametersNode = jobNode.appendNode("parameters")}	
+													parametersNode = jobNode.appendNode("parameters")}	
 													def parameterNode = parametersNode.appendNode("parameter")
 													parameterNode.appendNode("name", paramName)
 													parameterNode.appendNode("value", paramValue)
@@ -535,23 +543,24 @@
 
 					def parser = new XmlParser()
 					def rootNode = parser.parseText(writer.toString())
+					
 
-					if(getParameters(rootRun)){
-						def paramList = getParameters(rootRun)
-						for(def parameter in paramList){
-							def paramName = parameter.getName()
-							def paramValue = parameter.getValue()
-							if(!parametersNode){
-								def parametersNode = jobNode.appendNode("parameters")}	
-								def parameterNode = parametersNode.appendNode("parameter")
-								parameterNode.appendNode("name", paramName)
-								parameterNode.appendNode("value", paramValue)
+					if(rootProject instanceof MatrixProject){
+						def parametersNode = null
+						println  "is Matrix"
+						if(getParameters(rootRun)){
+							def paramList = getParameters(rootRun)
+							for(def parameter in paramList){
+								def paramName = parameter.getName()
+								def paramValue = parameter.getValue()
+								if(!parametersNode){
+									parametersNode = jobNode.appendNode("parameters")}	
+									def parameterNode = parametersNode.appendNode("parameter")
+									parameterNode.appendNode("name", paramName)
+									parameterNode.appendNode("value", paramValue)
+								}
 							}
-						}
 
-
-						if(rootProject instanceof MatrixProject){
-							println  "is Matrix"
 							def axisList = rootProject.getAxes()
 							findDownstream(rootProject, rootRun, rootNode)
 
@@ -563,11 +572,12 @@
 									def configJobName = "${jobName}/${axisName}=${value}"
 									def configJob = Jenkins.instance.getItemByFullName(configJobName)
 
+
 									if(configJob.builds){
 
 										if(isTheSameTime(configJob, rootRun)){
+											parametersNode = null
 											def configBuild = thisBuild
-
 											def configBuildNumber = configBuild.number
 											def configBuildUrl = configBuild.properties.get("envVars")["BUILD_URL"].toString()
 											def configResult = configBuild.result.toString()
@@ -584,12 +594,13 @@
 													def paramName = parameter.getName()
 													def paramValue = parameter.getValue()
 													if(!parametersNode){
-														def parametersNode = jobNode.appendNode("parameters")}	
+														parametersNode = jobNode.appendNode("parameters")}	
 														def parameterNode = parametersNode.appendNode("parameter")
 														parameterNode.appendNode("name", paramName)
 														parameterNode.appendNode("value", paramValue)
 													}
 												}
+
 
 
 
@@ -603,30 +614,43 @@
 
 							}
 							else{
-								findDownstream(rootProject, rootRun, rootNode)
-								findSubJobs(rootProject, rootRun, rootNode)
-								findSubJobs(rootRun, rootNode)
+								def parametersNode = null
+								if(getParameters(rootRun)){
+									def paramList = getParameters(rootRun)
+									for(def parameter in paramList){
+										def paramName = parameter.getName()
+										def paramValue = parameter.getValue()
+										if(!parametersNode){
+											parametersNode = rootNode.appendNode("parameters")}	
+											def parameterNode = parametersNode.appendNode("parameter")
+											parameterNode.appendNode("name", paramName)
+											parameterNode.appendNode("value", paramValue)
+										}
+									}
+									findDownstream(rootProject, rootRun, rootNode)
+									findSubJobs(rootProject, rootRun, rootNode)
+									findSubJobs(rootRun, rootNode)
+								}
+
+								def content = XmlUtil.serialize(rootNode)
+								fp.write(content, null)
+
 							}
 
-							def content = XmlUtil.serialize(rootNode)
-							fp.write(content, null)
+							try{
+								def entryProject = Jenkins.instance.getItem(myJobName)
+								def theBuild = entryProject.getBuildByNumber(myBuildNumber)
+								def upstreamCause = theBuild.getCause(Cause.UpstreamCause)
+								findProjectsTree(upstreamCause, entryProject, theBuild)
 
-						}
+							}
+							catch(NullPointerException e){
+								println "************************************"
+								println e
+								println "No Such Job in Jenkins or No This build correspond thie build Number"
+								println "************************************"
 
-						try{
-							def entryProject = Jenkins.instance.getItem(myJobName)
-							def theBuild = entryProject.getBuildByNumber(myBuildNumber)
-							def upstreamCause = theBuild.getCause(Cause.UpstreamCause)
-							findProjectsTree(upstreamCause, entryProject, theBuild)
-
-						}
-						catch(NullPointerException e){
-							println "************************************"
-							println e
-							println "No Such Job in Jenkins or No This build correspond thie build Number"
-							println "************************************"
-
-						}
+							}
 
 
 
