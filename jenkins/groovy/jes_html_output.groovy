@@ -51,7 +51,7 @@
 		for(def o = 0; o < runMap.size(); o++){
 			def cause = runMap.get(o).getCause(Cause.UpstreamCause)
 			if(cause){
-				if(cause.getUpstreamRun() == upBuild){
+				if(cause.getUpstreamRun().is(upBuild)){
 					thisBuild = runMap.get(o)
 					blnIsTheSameBuild = true
 					break
