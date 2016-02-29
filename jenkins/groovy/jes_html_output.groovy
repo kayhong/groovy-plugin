@@ -31,7 +31,7 @@
 				return null
 			}
 		}
-	}
+	
 
 	def getColor(def result){
 
