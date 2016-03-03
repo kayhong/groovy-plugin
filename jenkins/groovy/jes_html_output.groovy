@@ -31,38 +31,38 @@
 				return null
 			}
 		}
-	
 
-	def getColor(def result){
 
-		switch(result){
-			case "SUCCESS" :
-			return "green"
-			case "FAILURE" :
-			return "red"
-			default :
-			return "orange"
-		}
-	}
+		def getColor(def result){
 
-	def isTheSameTime(def project, def upBuild){
-		def runMap = project.builds
-		boolean blnIsTheSameBuild
-		for(def o = 0; o < runMap.size(); o++){
-			def cause = runMap.get(o).getCause(Cause.UpstreamCause)
-			if(cause){
-				if(cause.getUpstreamRun().is(upBuild)){
-					thisBuild = runMap.get(o)
-					blnIsTheSameBuild = true
-					break
-				}
-				else{
-					blnIsTheSameBuild = false
-				}
+			switch(result){
+				case "SUCCESS" :
+				return "green"
+				case "FAILURE" :
+				return "red"
+				default :
+				return "orange"
 			}
 		}
-		return blnIsTheSameBuild
-	}
+
+		def isTheSameTime(def project, def upBuild){
+			def runMap = project.builds
+			boolean blnIsTheSameBuild
+			for(def o = 0; o < runMap.size(); o++){
+				def cause = runMap.get(o).getCause(Cause.UpstreamCause)
+				if(cause){
+					if(cause.getUpstreamRun().is(upBuild)){
+						thisBuild = runMap.get(o)
+						blnIsTheSameBuild = true
+						break
+					}
+					else{
+						blnIsTheSameBuild = false
+					}
+				}
+			}
+			return blnIsTheSameBuild
+		}
 
 
 
@@ -97,13 +97,13 @@
 							if(!ul)
 							ul = node.appendNode("ul", [style : "list-style-type:circle"])
 
-							def li = ul.appendNode("li", [style : "border-style: solid; border-width: 1px"])
-							li.appendNode("span", [style : "border-style: solid; border-width: 1px"], name)
+							def li = ul.appendNode("li")
+							li.appendNode("span", [class: "colapse", style : "border-style: solid; border-width: 1px"], name)
 							def urlSpan = li.appendNode("span", [style : "border-style: solid; border-width: 1px"])
 							urlSpan.appendNode(
 								"a",
 								[href : url, target : "_blank"],
-								"Job_Url"
+								url
 								)
 							li.appendNode(
 								"span",
@@ -144,13 +144,13 @@
 											if(!configRootTag)
 											configRootTag = li.appendNode("ul", [style : "list-style-type:circle"])
 
-											li = configRootTag.appendNode("li", [style : "border-style: solid; border-width: 1px"])
-											li.appendNode("span", [style : "border-style: solid; border-width: 1px"], configJobName)
+											li = configRootTag.appendNode("li")
+											li.appendNode("span", [class: "colapse", style : "border-style: solid; border-width: 1px"], configJobName)
 											urlSpan = li.appendNode("span", [style : "border-style: solid; border-width: 1px"])
 											urlSpan.appendNode(
 												"a",
 												[href : configBuildUrl, target : "_blank"],
-												"Job_Url"
+												configBuildUrl
 												)
 											li.appendNode(
 												"span",
@@ -193,13 +193,11 @@
 									if(!ul)
 									ul = node.appendNode("ul", [style : "list-style-type:circle"])
 
-									def li = ul.appendNode(
-										"li",
-										[style : "border-style: solid; border-width: 1px"])
+									def li = ul.appendNode("li")
 
 									li.appendNode(
 										"span",
-										[style : "border-style: solid; border-width: 1px"],
+										[class: "colapse", style : "border-style: solid; border-width: 1px"],
 										name
 										)
 									def urlSpan = li.appendNode(
@@ -209,7 +207,7 @@
 									urlSpan.appendNode(
 										"a",
 										[href : url, target : "_blank"],
-										"Job_Url"
+										url
 										)
 
 									li.appendNode(
@@ -269,13 +267,13 @@
 							if(!ul)
 							ul = node.appendNode("ul", [style : "list-style-type:circle"])
 
-							def li = ul.appendNode("li", [style : "border-style: solid; border-width: 1px"])
-							li.appendNode("span", [style : "border-style: solid; border-width: 1px"], name)
+							def li = ul.appendNode("li")
+							li.appendNode("span", [class: "colapse", style : "border-style: solid; border-width: 1px"], name)
 							def urlSpan = li.appendNode("span", [style : "border-style: solid; border-width: 1px"])
 							urlSpan.appendNode(
 								"a",
 								[href : url, target : "_blank"],
-								"Job_Url"
+								url
 								)
 							li.appendNode(
 								"span",
@@ -317,13 +315,13 @@
 											if(!configRootTag)
 											configRootTag = li.appendNode("ul", [style : "list-style-type:circle"])
 
-											li = configRootTag.appendNode("li", [style : "border-style: solid; border-width: 1px"])
-											li.appendNode("span", [style : "border-style: solid; border-width: 1px"], configJobName)
+											li = configRootTag.appendNode("li")
+											li.appendNode("span", [class: "colapse", style : "border-style: solid; border-width: 1px"], configJobName)
 											urlSpan = li.appendNode("span", [style : "border-style: solid; border-width: 1px"])
 											urlSpan.appendNode(
 												"a",
 												[href : configBuildUrl, target : "_blank"],
-												"Job_Url"
+												configBuildUrl
 												)
 											li.appendNode(
 												"span",
@@ -356,12 +354,10 @@
 							if(!ul)
 							ul = node.appendNode("ul", [style : "list-style-type:circle"])
 
-							def li = ul.appendNode(
-								"li",
-								[style : "border-style: solid; border-width: 1px"])
+							def li = ul.appendNode("li")
 							li.appendNode(
 								"span",
-								[style : "border-style: solid; border-width: 1px"],
+								[class: "colapse", style : "border-style: solid; border-width: 1px"],
 								name
 								)
 							def urlSpan = li.appendNode(
@@ -371,7 +367,7 @@
 							urlSpan.appendNode(
 								"a",
 								[href : url, target : "_blank"],
-								"Job_Url"
+								url
 								)
 							li.appendNode(
 								"span",
@@ -433,13 +429,13 @@
 						if(!ul)
 						ul = node.appendNode("ul", [style : "list-style-type:circle"])
 
-						def li = ul.appendNode("li", [style : "border-style: solid; border-width: 1px"])
-						li.appendNode("span", [style : "border-style: solid; border-width: 1px"], name)
+						def li = ul.appendNode("li")
+						li.appendNode("span", [class: "colapse", style : "border-style: solid; border-width: 1px"], name)
 						def urlSpan = li.appendNode("span", [style : "border-style: solid; border-width: 1px"])
 						urlSpan.appendNode(
 							"a",
 							[href : url, target : "_blank"],
-							"Job_Url"
+							url
 							)
 						li.appendNode(
 							"span",
@@ -483,13 +479,14 @@
 										if(!configRootTag)
 										configRootTag = li.appendNode("ul", [style : "list-style-type:circle"])
 
-										li = configRootTag.appendNode("li", [style : "border-style: solid; border-width: 1px"])
-										li.appendNode("span", [style : "border-style: solid; border-width: 1px"], configJobName)
+										li = configRootTag.appendNode("li")
+										li.appendNode("span", [class: "colapse", style : "border-style: solid; border-width: 1px"], 
+											configJobName)
 										urlSpan = li.appendNode("span", [style : "border-style: solid; border-width: 1px"])
 										urlSpan.appendNode(
 											"a",
 											[href : configBuildUrl, target : "_blank"],
-											"Job_Url"
+											configBuildUrl
 											)
 										li.appendNode(
 											"span",
@@ -532,12 +529,10 @@
 								if(!ul)
 								ul = node.appendNode("ul", [style : "list-style-type:circle"])
 
-								def li = ul.appendNode(
-									"li",
-									[style : "border-style: solid; border-width: 1px"])
+								def li = ul.appendNode("li")
 								li.appendNode(
 									"span",
-									[style : "border-style: solid; border-width: 1px"],
+									[class: "colapse", style : "border-style: solid; border-width: 1px"],
 									name
 									)
 								def urlSpan = li.appendNode(
@@ -547,7 +542,7 @@
 								urlSpan.appendNode(
 									"a",
 									[href : url, target : "_blank"],
-									"Job_Url"
+									url
 									)
 								li.appendNode(
 									"span",
@@ -612,26 +607,56 @@
 		def number = rootRun.number
 		def result = rootRun.result.toString()
 		def color = getColor(result)
+      html.html{
+        head{
+			script(src : "https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js", "js")
+			script(type : "text/javascript", ''' 
+				window.onload = function() {
+					$('.job_line ul').hide();
+					$('.job_parent').find('ul').slideToggle();
 
-		html.html{
-			body{
-				ul(style : "list-style-type:circle"){
-					li{
-						span(style : "border-style: solid; border-width: 1px", name)
-						span(style : "border-style: solid; border-width: 1px"){
-							a(href : url, target : "_blank", "Job_Url")
-						}
-						span(style : "border-style: solid; border-width: 1px", "#" + number)
-						span(style : "border-style: solid; border-width: 1px; background-color:${color}", result)
-					}
-				}
-			}
+					$('.colapse').click(function() {
+						$(this).parent().find('ul').slideToggle();
+					});
+				}''')
+			style(type : "text/css", '''
+				.job_parent {
+        			margin-left: 1em;
+        			font-size: large;
+        			font-weight: bold;
+        			cursor: pointer;
+      			}
+      			.job_line {
+        			margin-left: 1em;
+        			margin-top: 0;
+        			margin-bottom: 1em;
+        			list-style-type: circle;
+        			font-size: medium;
+        			cursor: pointer;
+     			 }
+
+				''')
 		}
+               }
+		def parser = new XmlParser()
+		def rootNode = parser.parseText(writer.toString())
+
+		def bodyNode = rootNode.appendNode("body")
+		def ulNode = bodyNode.appendNode("ul",[class : "job_parent", style : "list-style-type:circle"])
+		def li = ulNode.appendNode("li")
+		li.appendNode("span", [class : "colapse", style : "border-style: solid; border-width: 1px"], name)
+		def spanNode = li.appendNode("span", [style : "border-style: solid; border-width: 1px"])
+		spanNode.appendNode("a",[href: url, target: "_blank"], url)
+		li.appendNode("span", [style : "border-style: solid; border-width: 1px"],"#" + number)
+		li.appendNode("span", [style : "border-style: solid; border-width: 1px; background-color:${color}"], result)
+
+
+
+	
 
 		fp.write(writer.toString(), null)
 
-		def parser = new XmlParser()
-		def rootNode = parser.parseText(writer.toString())
+		
 
 		def node = rootNode.body.ul.li[0]
 
@@ -663,13 +688,13 @@
 							if(!ul)
 							ul = node.appendNode("ul", [style : "list-style-type:circle"])
 
-							def li = ul.appendNode("li", [style : "border-style: solid; border-width: 1px"])
-							li.appendNode("span", [style : "border-style: solid; border-width: 1px"], configJobName)
+							li = ul.appendNode("li")
+							li.appendNode("span", [class : "colapse", style : "border-style: solid; border-width: 1px"], configJobName)
 							def urlSpan = li.appendNode("span", [style : "border-style: solid; border-width: 1px"])
 							urlSpan.appendNode(
 								"a",
 								[href : configBuildUrl, target : "_blank"],
-								"Job_Url"
+								configBuildUrl
 								)
 							li.appendNode(
 								"span",
