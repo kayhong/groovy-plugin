@@ -20,6 +20,7 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -35,6 +36,7 @@ import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import com.sap.smartbi.devops.hcp.internal.models.html5.ApplicationImpl;
 import com.sap.smartbi.devops.hcp.internal.models.html5.CommitImpl;
 import com.sap.smartbi.devops.hcp.internal.models.html5.DeleteApplicationError;
+import com.sap.smartbi.devops.hcp.internal.models.html5.RoleAssignment;
 import com.sap.smartbi.devops.hcp.internal.models.html5.SubscriptionImpl;
 import com.sap.smartbi.devops.hcp.internal.models.html5.VersionImpl;
 import com.sap.smartbi.devops.hcp.models.html5.Application;
@@ -142,6 +144,11 @@ public final class Html5ApplicationService {
 			boolean cloudRepository) {
 		return this.doCreateApplication(name, displayName, repository,
 				cloudRepository);
+	}
+
+	public void createApplicationRoleAssignments(final String name,
+			final Collection<RoleAssignment> assignments) {
+		this.doCreateRoleAssignements(name, assignments, false);
 	}
 
 	public Version createApplicationVersion(final String name,
@@ -322,6 +329,11 @@ public final class Html5ApplicationService {
 				response.close();
 			}
 		}
+	}
+
+	public void createSubscriptionRoleAssignments(final String name,
+			final Collection<RoleAssignment> assignments) {
+		this.doCreateRoleAssignements(name, assignments, true);
 	}
 
 	public void deleteApplication(final String name) {
@@ -881,6 +893,50 @@ public final class Html5ApplicationService {
 				if (response != null) {
 					response.close();
 				}
+			}
+		}
+	}
+
+	private void doCreateRoleAssignements(final String name,
+			final Collection<RoleAssignment> assignments,
+			boolean forSubscription) {
+
+		if (name == null) {
+			throw new IllegalArgumentException("\"name\" is null");
+		}
+
+		if (name.length() == 0) {
+			throw new IllegalArgumentException("\"name\" is empty");
+		}
+
+		if (assignments == null) {
+			throw new IllegalArgumentException(
+					"\"assignments\" should not be null");
+		}
+
+		assert this.connectionInfo != null : "\"this.connectionInfo\" should not be null";
+
+		URI uri = UriBuilder
+				.fromUri(URI_TEMPLATE)
+				.path(forSubscription ? "subscriptions" : "applications")
+				.path(name)
+				.path("roleassignments")
+				.build(this.connectionInfo.getDispatcher(),
+						this.connectionInfo.getHost(),
+						this.connectionInfo.getAccount());
+
+		Response response = null;
+
+		try {
+			GenericEntity<Collection<RoleAssignment>> entity = new GenericEntity<Collection<RoleAssignment>>(
+					assignments) {
+			};
+
+			this.invokeService(uri, HttpMethod.PUT,
+					Entity.entity(entity, MediaType.APPLICATION_JSON_TYPE));
+		} finally {
+			if (response != null) {
+				response.close();
 			}
 		}
 	}

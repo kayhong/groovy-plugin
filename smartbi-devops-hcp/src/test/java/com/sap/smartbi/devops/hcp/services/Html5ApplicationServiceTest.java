@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
 import java.util.UUID;
@@ -16,6 +17,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.sap.smartbi.devops.hcp.internal.models.html5.RoleAssignment;
 import com.sap.smartbi.devops.hcp.models.html5.Application;
 import com.sap.smartbi.devops.hcp.models.html5.Commit;
 import com.sap.smartbi.devops.hcp.models.html5.HcpConnectionInfo;
@@ -132,6 +134,27 @@ public final class Html5ApplicationServiceTest {
 		Html5ApplicationService.getInstance(CONNECTION_INFO)
 				.createApplicationVersion(UUID.randomUUID().toString(),
 						UUID.randomUUID().toString(), "");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testCreateApplicationRoleAssignmentsNullName() {
+		Html5ApplicationService.getInstance(CONNECTION_INFO)
+				.createApplicationRoleAssignments(null,
+						new ArrayList<RoleAssignment>());
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testCreateApplicationRoleAssignmentsEmptyName() {
+		Html5ApplicationService.getInstance(CONNECTION_INFO)
+				.createApplicationRoleAssignments("",
+						new ArrayList<RoleAssignment>());
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testCreateApplicationRoleAssignmentsNullAssignments() {
+		Html5ApplicationService.getInstance(CONNECTION_INFO)
+				.createApplicationRoleAssignments(UUID.randomUUID().toString(),
+						null);
 	}
 
 	@Test
@@ -653,15 +676,16 @@ public final class Html5ApplicationServiceTest {
 		try (FileWriter writer = new FileWriter(file2.toFile())) {
 			writer.write("some other content");
 		}
-		
-		Path subDirectory = Files.createDirectory(directory.resolve("sub-directory"));
-		
+
+		Path subDirectory = Files.createDirectory(directory
+				.resolve("sub-directory"));
+
 		Path file3 = Files.createFile(subDirectory.resolve("file3.txt"));
 
 		try (FileWriter writer = new FileWriter(file3.toFile())) {
 			writer.write("yet another content");
 		}
-		
+
 		Html5ApplicationService service = Html5ApplicationService
 				.getInstance(CONNECTION_INFO);
 
