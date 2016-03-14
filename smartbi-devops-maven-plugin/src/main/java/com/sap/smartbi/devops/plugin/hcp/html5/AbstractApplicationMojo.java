@@ -27,6 +27,7 @@ public abstract class AbstractApplicationMojo extends AbstractMojo implements
 	protected final static String PROXY_HOST_PROPERTY = "proxyHost";
 	protected final static String PROXY_PORT_PROPERTY = "proxyPort";
 	protected final static String REPOSITORY_PROPERTY = "repository";
+	protected final static String ROLE_ASSIGNMENTS_PROPERTY = "assignments";
 	protected final static String SUBSCRIPTION_PROPERTY = "subscription";
 	protected final static String USER_PROPERTY = "user";
 	protected final static String VERSION_PROPERTY = "version";
