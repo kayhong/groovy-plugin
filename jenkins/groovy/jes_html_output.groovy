@@ -40,6 +40,8 @@
 				return "green"
 				case "FAILURE" :
 				return "red"
+				case "in Progress" : 
+				return "gray"
 				default :
 				return "orange"
 			}
@@ -92,6 +94,9 @@
 							def url = theBuild.properties.get("envVars")["BUILD_URL"].toString()
 							def number = theBuild.number
 							def result = theBuild.result.toString()
+							if(theBuild.isInProgress()){
+								result = "in Progress"
+							}
 							def color = getColor(result)
 
 							if(!ul)
@@ -139,6 +144,9 @@
 											def configBuildNumber = configBuild.number
 											def configBuildUrl = configBuild.properties.get("envVars")["BUILD_URL"].toString()
 											def configResult = configBuild.result.toString()
+											if(configBuild.isInProgress()){
+												configResult = "in Progress"
+											}
 											color = getColor(configResult)
 
 											if(!configRootTag)
@@ -188,6 +196,9 @@
 									def url = theBuild.properties.get("envVars")["BUILD_URL"].toString()
 									def number = theBuild.number
 									def result = theBuild.result.toString()
+									if(theBuild.isInProgress()){
+										result = "in Progress"
+									}
 									def color = getColor(result)
 
 									if(!ul)
@@ -262,6 +273,9 @@
 							def url = buildsList.get(j).properties.get("envVars")["BUILD_URL"].toString()
 							def number = buildsList.get(j).number
 							def result = buildsList.get(j).result.toString()
+							if(buildsList.get(j).isInProgress()){
+								result = "in Progress"
+							}
 							def color = getColor(result)
 
 							if(!ul)
@@ -310,6 +324,9 @@
 											def configBuildNumber = configBuild.number
 											def configBuildUrl = configBuild.properties.get("envVars")["BUILD_URL"].toString()
 											def configResult = configBuild.result.toString()
+											if(configBuild.isInProgress()){
+												configResult = "in Progress"
+											}
 											color = getColor(configResult)
 
 											if(!configRootTag)
@@ -349,6 +366,9 @@
 							def url = buildsList.get(j).properties.get("envVars")["BUILD_URL"].toString()
 							def number = buildsList.get(j).number
 							def result = buildsList.get(j).result.toString()
+							if(buildsList.get(j).isInProgress()){
+								result = "in Progress"
+							}
 							def color = getColor(result)
 
 							if(!ul)
@@ -424,6 +444,9 @@
 						def url = theBuild.properties.get("envVars")["BUILD_URL"].toString()
 						def number = theBuild.number
 						def result = theBuild.result.toString()
+						if(theBuild.isInProgress()){
+							result = "in Progress"
+						}
 						def color = getColor(result)
 
 						if(!ul)
@@ -474,6 +497,9 @@
 										def configBuildNumber = configBuild.number
 										def configBuildUrl = configBuild.properties.get("envVars")["BUILD_URL"].toString()
 										def configResult = configBuild.result.toString()
+										if(configBuild.isInProgress()){
+											configResult = "in Progress"
+										}
 										color = getColor(configResult)
 
 										if(!configRootTag)
@@ -524,6 +550,9 @@
 								def url = theBuild.properties.get("envVars")["BUILD_URL"].toString()
 								def number = theBuild.number
 								def result = theBuild.result.toString()
+								if(theBuild.isInProgress()){
+									result = "in Progress"
+								}
 								def color = getColor(result)
 
 								if(!ul)
@@ -606,38 +635,41 @@
 		def url = rootRun.properties.get("envVars")["BUILD_URL"].toString()
 		def number = rootRun.number
 		def result = rootRun.result.toString()
-		def color = getColor(result)
-      html.html{
-        head{
-			script(src : "https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js", "js")
-			script(type : "text/javascript", ''' 
-				window.onload = function() {
-					$('.job_line ul').hide();
-					$('.job_parent').find('ul').slideToggle();
-
-					$('.colapse').click(function() {
-						$(this).parent().find('ul').slideToggle();
-					});
-				}''')
-			style(type : "text/css", '''
-				.job_parent {
-        			margin-left: 1em;
-        			font-size: large;
-        			font-weight: bold;
-        			cursor: pointer;
-      			}
-      			.job_line {
-        			margin-left: 1em;
-        			margin-top: 0;
-        			margin-bottom: 1em;
-        			list-style-type: circle;
-        			font-size: medium;
-        			cursor: pointer;
-     			 }
-
-				''')
+		if(rootRun.isInProgress()){
+			result = "in Progress"
 		}
-               }
+		def color = getColor(result)
+		html.html{
+			head{
+				script(src : "https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js", "js")
+				script(type : "text/javascript", ''' 
+					window.onload = function() {
+						$('.job_line ul').hide();
+						$('.job_parent').find('ul').slideToggle();
+
+						$('.colapse').click(function() {
+							$(this).parent().find('ul').slideToggle();
+							});
+							}''')
+				style(type : "text/css", '''
+					.job_parent {
+						margin-left: 1em;
+						font-size: large;
+						font-weight: bold;
+						cursor: pointer;
+					}
+					.job_line {
+						margin-left: 1em;
+						margin-top: 0;
+						margin-bottom: 1em;
+						list-style-type: circle;
+						font-size: medium;
+						cursor: pointer;
+					}
+
+					''')
+			}
+		}
 		def parser = new XmlParser()
 		def rootNode = parser.parseText(writer.toString())
 
@@ -652,7 +684,7 @@
 
 
 
-	
+
 
 		fp.write(writer.toString(), null)
 
@@ -684,6 +716,9 @@
 							def configBuildNumber = configBuild.number
 							def configBuildUrl = configBuild.properties.get("envVars")["BUILD_URL"].toString()
 							def configResult = configBuild.result.toString()
+							if(configBuild.isInProgress()){
+								configResult = "in Progress"
+							}
 							color = getColor(configResult)
 							if(!ul)
 							ul = node.appendNode("ul", [style : "list-style-type:circle"])
