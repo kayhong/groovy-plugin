@@ -239,6 +239,17 @@
 							}
 						}
 					}
+					else{
+						
+                          node.span[3].replaceNode({
+                          new groovy.util.Node(node,
+								"span",
+								[style : "border-style: solid; border-width: 1px; background-color:gray"],
+								"in Progress")		
+                          })
+                      	
+						
+					}
 				}
 			}
 
@@ -591,6 +602,19 @@
 						}
 					}
 				}
+				else{
+							
+                  node.span[3].replaceNode({
+                    new groovy.util.Node(null,
+								"span",
+								[style : "border-style: solid; border-width: 1px; background-color:gray"],
+								"in Progress")	
+                  	
+                  })
+                  
+						
+					
+				}
 			}
 		}
 		catch(NullPointerException e){
@@ -640,7 +664,7 @@
 		}
 		def color = getColor(result)
 		html.html{
-			head{
+			head{				
 				script(src : "https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js", "js")
 				script(type : "text/javascript", ''' 
 					window.onload = function() {
@@ -668,12 +692,18 @@
 					}
 
 					''')
+
 			}
 		}
 		def parser = new XmlParser()
 		def rootNode = parser.parseText(writer.toString())
 
 		def bodyNode = rootNode.appendNode("body")
+		def div = bodyNode.appendNode("div",[style:"margin:auto"])
+		div.appendNode("a", 
+			[href:"http://dewdflhana1265.emea.global.corp.sap:8080/job/JES_Test/lastCompletedBuild/rebuild/parameterized", 
+			target: "_blank", style: "font-size: 30px; background-color:hsla(120,100%,25%,0.3); margin-left:40%"],
+			"ReBuild")
 		def ulNode = bodyNode.appendNode("ul",[class : "job_parent", style : "list-style-type:circle"])
 		def li = ulNode.appendNode("li")
 		li.appendNode("span", [class : "colapse", style : "border-style: solid; border-width: 1px"], name)
