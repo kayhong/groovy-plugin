@@ -701,7 +701,7 @@
 		def bodyNode = rootNode.appendNode("body")
 		def div = bodyNode.appendNode("div",[style:"margin:auto"])
 		div.appendNode("a", 
-			[href:"http://dewdflhana1265.emea.global.corp.sap:8080/job/JES_Test/lastCompletedBuild/rebuild/parameterized", 
+			[href:"http://dewdflhana1265.emea.global.corp.sap:8080/job/JES/lastCompletedBuild/rebuild/parameterized", 
 			target: "_blank", style: "font-size: 30px; background-color:hsla(120,100%,25%,0.3); margin-left:40%"],
 			"ReBuild")
 		def ulNode = bodyNode.appendNode("ul",[class : "job_parent", style : "list-style-type:circle"])
