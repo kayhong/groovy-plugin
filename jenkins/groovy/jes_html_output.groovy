@@ -41,7 +41,7 @@
 				case "FAILURE" :
 				return "red"
 				case "in Progress" : 
-				return "gray"
+				return "blue"
 				default :
 				return "orange"
 			}
