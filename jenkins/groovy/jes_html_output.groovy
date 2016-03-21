@@ -41,7 +41,7 @@
 				case "FAILURE" :
 				return "red"
 				case "in Progress" : 
-				return "blue"
+				return "rgb(0,240,230)"
 				default :
 				return "orange"
 			}
@@ -244,7 +244,7 @@
                           node.span[3].replaceNode({
                           new groovy.util.Node(node,
 								"span",
-								[style : "border-style: solid; border-width: 1px; background-color:blue"],
+								[style : "border-style: solid; border-width: 1px; background-color:rgb(0,240,230)"],
 								"in Progress")		
                           })
                       	
@@ -610,10 +610,7 @@
 								[style : "border-style: solid; border-width: 1px; background-color:blue"],
 								"in Progress")	
                   	
-                  })
-                  
-						
-					
+                  }) 
 				}
 			}
 		}
