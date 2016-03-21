@@ -66,6 +66,21 @@ def isTheSameTime(def project, def upBuild){
 	return blnIsTheSameBuild
 }
 
+def getAggregateStatus(def result){
+
+	if(result=="in Progress"){
+		this.aggregateStatus = result
+	}
+
+	if(result=="FAILURE"&&this.aggregateStatus!="in Progress"){
+		this.aggregateStatus = result
+	}
+	if(result=="UNSTABLE"&&this.aggregateStatus=="SUCCESS"){
+		this.aggregateStatus = result
+	}
+	println "The current Aggregate Status is +++ " + this.aggregateStatus
+}
+
 def getBranchInfo(def paramName, def paramValue){
 
 	switch(paramName) {
@@ -106,25 +121,28 @@ def addParams(def build, def node, def jobNode){
 def gatherProblems(def name, def url, def number, def status){
 	if(this.pbJobs=="unkown"){
 		if(status!="SUCCESS"){
-	  		this.pbJobs = """<li><span>${name}</span>
-	  		<span><a href='${url}' target='_blank'>${url}</a></span>
-	  		<span> #${number}</span>
-	  		<span> ${status}</span>
-	  		</li>"""
-	  	}
+			this.pbJobs = """<li><span>${name}</span>
+			<span><a href='${url}' target='_blank'>${url}</a></span>
+			<span> #${number}</span>
+			<span> ${status}</span>
+			</li>"""
+		}
 	}
 	else{
 		if(status!="SUCCESS"){
-	  		this.pbJobs += """<li><span>${name}</span>
-	  		<span><a href='${url}' target='_blank'>${url}</a></span>
-	  		<span> #${number}</span>
-	  		<span> ${status}</span>
-	  		</li>"""
-	  	}
+			this.pbJobs += """<li><span>${name}</span>
+			<span><a href='${url}' target='_blank'>${url}</a></span>
+			<span> #${number}</span>
+			<span> ${status}</span>
+			</li>"""
+		}
 	}
 	
 
 }
+
+
+
 
 
 
@@ -158,17 +176,15 @@ def findSubJobs(def project, def upBuild, def node){
 						def url = theBuild.properties.get("envVars")["BUILD_URL"].toString()
 						def number = theBuild.number
 						def result = theBuild.result.toString()
+						if(theBuild.isInProgress()){
+							result = "in Progress"
+						}
+						println "After juge whether this build is in Progress" + result
 
 						gatherProblems(name, url, number, result)
 
-
-						if(result=="FAILURE"){
-							this.aggregateStatus = result
-						}
-						if(result=="UNSTABLE"&&this.aggregateStatus=="SUCCESS"){
-							this.aggregateStatus = result
-						}
-
+						getAggregateStatus(result)
+						
 
 						def jobNode = node.appendNode("job")
 						jobNode.appendNode("name", name)
@@ -203,15 +219,15 @@ def findSubJobs(def project, def upBuild, def node){
 										def configBuildNumber = configBuild.number
 										def configBuildUrl = configBuild.properties.get("envVars")["BUILD_URL"].toString()
 										def configResult = configBuild.result.toString()
+										if(configBuild.isInProgress()){
+											configResult = "in Progress"
+										}
+
+										println "After juge whether this build is in Progress" + configResult
 
 										gatherProblems(configJobName, configBuildUrl, configBuildNumber, configResult)
-
-										if(configResult=="FAILURE"){
-											this.aggregateStatus = configResult
-										}
-										if(configResult=="UNSTABLE"&&this.aggregateStatus=="SUCCESS"){
-											this.aggregateStatus = configResult
-										}
+										getAggregateStatus(configResult)
+										
 
 										parametersNode = null
 
@@ -229,6 +245,9 @@ def findSubJobs(def project, def upBuild, def node){
 										findSubJobs(configBuild, configJobNode)
 
 									}
+									/*else{
+										this.aggregateStatus = "in Progress"
+									}*/
 
 								}
 							}
@@ -249,16 +268,14 @@ def findSubJobs(def project, def upBuild, def node){
 								def url = theBuild.properties.get("envVars")["BUILD_URL"].toString()
 								def number = theBuild.number
 								def result = theBuild.result.toString()
+								if(theBuild.isInProgress()){
+									result = "in Progress"
+								}
+								println "After juge whether this build is in Progress" + result
 
 								gatherProblems(name, url, number, result)
-								if(result=="FAILURE"){
-									this.aggregateStatus = result
-								}
-								if(result=="UNSTABLE"&&this.aggregateStatus=="SUCCESS"){
-									this.aggregateStatus = result
-								}
-
-
+								getAggregateStatus(result)
+								
 
 								def jobNode = node.appendNode("job")
 								jobNode.appendNode("name", name)
@@ -276,6 +293,9 @@ def findSubJobs(def project, def upBuild, def node){
 							}
 						}
 					}
+				}
+				else{
+					this.aggregateStatus = "in Progress"
 				}
 			}
 		}
@@ -312,15 +332,12 @@ def findSubJobs(def upBuild, def node){
 						def url = buildsList.get(j).properties.get("envVars")["BUILD_URL"].toString()
 						def number = buildsList.get(j).number
 						def result = buildsList.get(j).result.toString()
+						if(buildsList.get(j).isInProgress()){
+							result = "in Progress"
+						}
+						println "After juge whether this build is in Progress" + result
 						gatherProblems(name, url, number, result)
-
-						if(result=="FAILURE"){
-							this.aggregateStatus = result
-						}
-						if(result=="UNSTABLE"&&this.aggregateStatus=="SUCCESS"){
-							this.aggregateStatus = result
-						}
-
+						getAggregateStatus(result)
 
 						def jobNode = node.appendNode("job")
 						jobNode.appendNode("name", name)
@@ -356,16 +373,13 @@ def findSubJobs(def upBuild, def node){
 										def configBuildNumber = configBuild.number
 										def configBuildUrl = configBuild.properties.get("envVars")["BUILD_URL"].toString()
 										def configResult = configBuild.result.toString()
-
+										if(configBuild.isInProgress()){
+											configResult = "in Progress"
+										}
+										println "After juge whether this build is in Progress" + configResult
 										gatherProblems(configJobName, configBuildUrl, configBuildNumber, configResult)
-
-										if(configResult=="FAILURE"){
-											this.aggregateStatus = configResult
-										}
-										if(configResult=="UNSTABLE"&&this.aggregateStatus=="SUCCESS"){
-											this.aggregateStatus = configResult
-										}
-
+										getAggregateStatus(configResult)
+										
 
 										def configJobNode = jobNode.appendNode("job")
 										configJobNode.appendNode("name", configJobName)
@@ -377,60 +391,61 @@ def findSubJobs(def upBuild, def node){
 										addParams(configBuild, parametersNode, configJobNode)
 
 
-											findSubJobs(configJob, configBuild, configJobNode)
-											findSubJobs(configBuild, configJobNode)
-										}
-
+										findSubJobs(configJob, configBuild, configJobNode)
+										findSubJobs(configBuild, configJobNode)
 									}
+									/*else{
+										this.aggregateStatus = "in Progress"
+									}*/
+
 								}
 							}
 						}
-						else{
-							println "is normal project"
-							def name = subProject.name
-							def url = buildsList.get(j).properties.get("envVars")["BUILD_URL"].toString()
-							def number = buildsList.get(j).number
-							def result = buildsList.get(j).result.toString()
-
-							gatherProblems(name, url, number, result)
-
-							if(result=="FAILURE"){
-								this.aggregateStatus = result
-							}
-							if(result=="UNSTABLE"&&this.aggregateStatus=="SUCCESS"){
-								this.aggregateStatus = result
-							}
-
-
-							def jobNode = node.appendNode("job")
-							jobNode.appendNode("name", name)
-							jobNode.appendNode("number", number)
-							jobNode.appendNode("url", url)
-							jobNode.appendNode("status", result)
-
-							addParams(buildsList.get(j), parametersNode, jobNode)
-
-
-								findSubJobs(subProject, buildsList.get(j), jobNode)
-								findSubJobs(buildsList.get(j), jobNode)
-								findDownstream(subProject, buildsList.get(j), jobNode)
-							}
+					}
+					else{
+						println "is normal project"
+						def name = subProject.name
+						def url = buildsList.get(j).properties.get("envVars")["BUILD_URL"].toString()
+						def number = buildsList.get(j).number
+						def result = buildsList.get(j).result.toString()
+						if(buildsList.get(j).isInProgress()){
+							result = "in Progress"
 						}
-						catch(NullPointerException e){
-							println "------------------No Project of the build" + buildsList.get(j)
+						println "After juge whether this build is in Progress" + result
 
-						}
+						gatherProblems(name, url, number, result)
+						getAggregateStatus(result)
+
+
+						def jobNode = node.appendNode("job")
+						jobNode.appendNode("name", name)
+						jobNode.appendNode("number", number)
+						jobNode.appendNode("url", url)
+						jobNode.appendNode("status", result)
+
+						addParams(buildsList.get(j), parametersNode, jobNode)
+
+
+						findSubJobs(subProject, buildsList.get(j), jobNode)
+						findSubJobs(buildsList.get(j), jobNode)
+						findDownstream(subProject, buildsList.get(j), jobNode)
 					}
 				}
+				catch(NullPointerException e){
+					println "------------------No Project of the build" + buildsList.get(j)
 
+				}
 			}
-
-			catch(NullPointerException e){
-				println e
-				println "**** No Project correspond the build***"
-			}
-
 		}
+
+	}
+
+	catch(NullPointerException e){
+		println e
+		println "**** No Project correspond the build***"
+	}
+
+}
 
 //Method to find Downstream projects
 def findDownstream(def project, def build, def node){
@@ -455,15 +470,13 @@ def findDownstream(def project, def build, def node){
 					def url = theBuild.properties.get("envVars")["BUILD_URL"].toString()
 					def number = theBuild.number
 					def result = theBuild.result.toString()
+					if(theBuild.isInProgress()){
+						result = "in Progress"
+					}
+					println "After juge whether this build is in Progress" + result
 
 					gatherProblems(name, url, number, result)
-
-					if(result=="FAILURE"){
-						this.aggregateStatus = result
-					}
-					if(result=="UNSTABLE"&&this.aggregateStatus=="SUCCESS"){
-						this.aggregateStatus = result
-					}
+					getAggregateStatus(result)					
 
 
 					def jobNode = node.appendNode("job")
@@ -475,263 +488,268 @@ def findDownstream(def project, def build, def node){
 					addParams(theBuild, parametersNode, jobNode)
 
 
-						findDownstream(dproject, theBuild, jobNode)
-						def axisList = dproject.getAxes()
-						for(def i = 0; i < axisList.size(); i++){
-							def axis = axisList.get(i)
-							def axisName = axis.getName()
-							for(def j = 0; j < axis.size(); j++){
-								def value = axis.value(j)
-								def configJobName = "${name}/${axisName}=${value}"
-								def configJob = Jenkins.instance.getItemByFullName(configJobName)
+					findDownstream(dproject, theBuild, jobNode)
+					def axisList = dproject.getAxes()
+					for(def i = 0; i < axisList.size(); i++){
+						def axis = axisList.get(i)
+						def axisName = axis.getName()
+						for(def j = 0; j < axis.size(); j++){
+							def value = axis.value(j)
+							def configJobName = "${name}/${axisName}=${value}"
+							def configJob = Jenkins.instance.getItemByFullName(configJobName)
 
 
-								if(configJob.builds){
+							if(configJob.builds){
 
-									if(isTheSameTime(configJob, theBuild)){
-										parametersNode = null
-										def configBuild = thisBuild
-										println configBuild
-										def configBuildNumber = configBuild.number
-										def configBuildUrl = configBuild.properties.get("envVars")["BUILD_URL"].toString()
-										def configResult = configBuild.result.toString()
-
-										gatherProblems(configJobName, configBuildUrl, configBuildNumber, configResult)
-
-										if(configResult=="FAILURE"){
-											this.aggregateStatus = configResult
-										}
-										if(configResult=="UNSTABLE"&&this.aggregateStatus=="SUCCESS"){
-											this.aggregateStatus = configResult
-										}
-
-
-										def configJobNode = jobNode.appendNode("job")
-										configJobNode.appendNode("name", configJobName)
-										configJobNode.appendNode("number", configBuildNumber)
-										configJobNode.appendNode("url", configBuildUrl)
-										configJobNode.appendNode("status", configResult)
-
-										addParams(configBuild, parametersNode, configJobNode)
-
-
-
-											findSubJobs(configJob, configBuild, configJobNode)
-											findSubJobs(configBuild, configJobNode)
-
-
-										}
-
+								if(isTheSameTime(configJob, theBuild)){
+									parametersNode = null
+									def configBuild = thisBuild
+									println configBuild
+									def configBuildNumber = configBuild.number
+									def configBuildUrl = configBuild.properties.get("envVars")["BUILD_URL"].toString()
+									def configResult = configBuild.result.toString()
+									if(configBuild.isInProgress()){
+										configResult = "in Progress"							
 									}
+									println "After juge whether this build is in Progress" + configResult
+									gatherProblems(configJobName, configBuildUrl, configBuildNumber, configResult)
+									getAggregateStatus(configResult)
+							
+
+									def configJobNode = jobNode.appendNode("job")
+									configJobNode.appendNode("name", configJobName)
+									configJobNode.appendNode("number", configBuildNumber)
+									configJobNode.appendNode("url", configBuildUrl)
+									configJobNode.appendNode("status", configResult)
+
+									addParams(configBuild, parametersNode, configJobNode)
+
+
+
+									findSubJobs(configJob, configBuild, configJobNode)
+									findSubJobs(configBuild, configJobNode)
+
+
 								}
+								/*else{
+									this.aggregateStatus = "in Progress"
+								}*/
 
 							}
-
 						}
-						else{
 
-							if(dproject.builds){
-								println "is normal project"
+					}
 
-								if(isTheSameTime(dproject, build)){
+				}
+				else{
 
-									theBuild = thisBuild
-									def name = dproject.name
-									def url = theBuild.properties.get("envVars")["BUILD_URL"].toString()
-									def number = theBuild.number
-									def result = theBuild.result.toString()
+					if(dproject.builds){
+						println "is normal project"
 
-									gatherProblems(name, url, number, result)
+						if(isTheSameTime(dproject, build)){
 
-									if(result=="FAILURE"){
-										this.aggregateStatus = result
-									}
-									if(result=="UNSTABLE"&&this.aggregateStatus=="SUCCESS"){
-										this.aggregateStatus = result
-									}
-
-
-									def jobNode = node.appendNode("job")
-									jobNode.appendNode("name", name)
-									jobNode.appendNode("number", number)
-									jobNode.appendNode("url", url)
-									jobNode.appendNode("status", result)
-
-									addParams(theBuild, parametersNode, jobNode)
-
-	
-
-
-									findSubJobs(dproject, theBuild, jobNode)
-									findSubJobs(theBuild, jobNode)
-									findDownstream(dproject, theBuild, jobNode)
-								}
+							theBuild = thisBuild
+							def name = dproject.name
+							def url = theBuild.properties.get("envVars")["BUILD_URL"].toString()
+							def number = theBuild.number
+							def result = theBuild.result.toString()
+							if(theBuild.isInProgress()){
+								result = "in Progress"
 							}
+							println "After juge whether this build is in Progress" + result
+
+							gatherProblems(name, url, number, result)
+							getAggregateStatus(result)
+
+							
+
+
+							def jobNode = node.appendNode("job")
+							jobNode.appendNode("name", name)
+							jobNode.appendNode("number", number)
+							jobNode.appendNode("url", url)
+							jobNode.appendNode("status", result)
+
+							addParams(theBuild, parametersNode, jobNode)
+
+
+
+
+							findSubJobs(dproject, theBuild, jobNode)
+							findSubJobs(theBuild, jobNode)
+							findDownstream(dproject, theBuild, jobNode)
 						}
 					}
 				}
 			}
-			catch(NullPointerException e){
-				println e
-				println "*** No Project correspond the build"
-			}
-
-
-		}
-
-
-		def findProjectsTree(def cause, def rootProject, def theBuild){
-
-			def rootRun = theBuild
-			if(cause){
-				for(; cause; ){
-					rootRun = cause.getUpstreamRun()
-					rootProject = rootRun.getProject()
-					cause = cause.getUpstreamRun().getCause(Cause.UpstreamCause)
-				}
-			}
-
-			if(build.workspace.isRemote()){
-				def channel = build.workspace.channel
-				fp = new FilePath(channel, outputFileFolder + "/jes.xml")
-			}
 			else{
-				fp = new FilePath(new File(outputFileFolder + "/jes.xml"))
+				this.aggregateStatus = "in Progress"
 			}
-
-			fp.write("", null)
-			def writer = new StringWriter()
-			def xmlMarkup = new MarkupBuilder(writer)
-
-			def jobName = rootProject.name
-			def buildUrl = rootRun.properties.get("envVars")["BUILD_URL"].toString()
-			def buildNumber = rootRun.number
-			def result = rootRun.result.toString()
-
-			gatherProblems(jobName, buildUrl, buildNumber, result)
-
-			this.aggregateStatus = result
-
-			xmlMarkup.job{
-				name(jobName)
-				number(buildNumber)
-				url(buildUrl)
-				status(result)
-
-			}
+		}
+	}
+	catch(NullPointerException e){
+		println e
+		println "*** No Project correspond the build"
+	}
 
 
-
-			fp.write(writer.toString(), null)
-
-
-			def rootNode = this.parser.parseText(writer.toString())
+}
 
 
+def findProjectsTree(def cause, def rootProject, def theBuild){
 
-			if(rootProject instanceof MatrixProject){
-				def parametersNode = null
-				println  "is Matrix"
-				addParams(rootRun, parametersNode, rootNode)
+	def rootRun = theBuild
+	if(cause){
+		for(; cause; ){
+			rootRun = cause.getUpstreamRun()
+			rootProject = rootRun.getProject()
+			cause = cause.getUpstreamRun().getCause(Cause.UpstreamCause)
+		}
+	}
 
+	if(build.workspace.isRemote()){
+		def channel = build.workspace.channel
+		fp = new FilePath(channel, outputFileFolder + "/jes.xml")
+	}
+	else{
+		fp = new FilePath(new File(outputFileFolder + "/jes.xml"))
+	}
 
-				def axisList = rootProject.getAxes()
-				findDownstream(rootProject, rootRun, rootNode)
+	fp.write("", null)
+	def writer = new StringWriter()
+	def xmlMarkup = new MarkupBuilder(writer)
 
-				for(def i = 0; i < axisList.size(); i++){
-					def axis = axisList.get(i)
-					def axisName = axis.getName()
-					for(def j = 0; j < axis.size(); j++){
-						def value = axis.value(j)
-						def configJobName = "${jobName}/${axisName}=${value}"
-						def configJob = Jenkins.instance.getItemByFullName(configJobName)
+	def jobName = rootProject.name
+	def buildUrl = rootRun.properties.get("envVars")["BUILD_URL"].toString()
+	def buildNumber = rootRun.number
+	def result = rootRun.result.toString()
 
+	gatherProblems(jobName, buildUrl, buildNumber, result)
 
-						if(configJob.builds){
+	this.aggregateStatus = result
 
-							if(isTheSameTime(configJob, rootRun)){
-								parametersNode = null
-								def configBuild = thisBuild
-								def configBuildNumber = configBuild.number
-								def configBuildUrl = configBuild.properties.get("envVars")["BUILD_URL"].toString()
-								def configResult = configBuild.result.toString()
+	xmlMarkup.job{
+		name(jobName)
+		number(buildNumber)
+		url(buildUrl)
+		status(result)
 
-								gatherProblems(configJobName, configBuildUrl, configBuildNumber, configResult)
-
-								if(configResult=="FAILURE"){
-									this.aggregateStatus = configResult
-								}
-								if(configResult=="UNSTABLE"&&this.aggregateStatus=="SUCCESS"){
-									this.aggregateStatus = configResult
-								}
+	}
 
 
 
-								def jobNode = rootNode.appendNode("job")
-								jobNode.appendNode("name",configJobName)
-								jobNode.appendNode("number", configBuildNumber)
-								jobNode.appendNode("url", configBuildUrl)
-								jobNode.appendNode("status", configResult)
+	fp.write(writer.toString(), null)
 
-								addParams(configBuild, parametersNode, jobNode)
+
+	def rootNode = this.parser.parseText(writer.toString())
 
 
 
+	if(rootProject instanceof MatrixProject){
+		def parametersNode = null
+		println  "is Matrix"
+		addParams(rootRun, parametersNode, rootNode)
 
-								findSubJobs(configJob, configBuild, jobNode)
-								findSubJobs(configJob, jobNode)
-							}
+
+		def axisList = rootProject.getAxes()
+		findDownstream(rootProject, rootRun, rootNode)
+
+		for(def i = 0; i < axisList.size(); i++){
+			def axis = axisList.get(i)
+			def axisName = axis.getName()
+			for(def j = 0; j < axis.size(); j++){
+				def value = axis.value(j)
+				def configJobName = "${jobName}/${axisName}=${value}"
+				def configJob = Jenkins.instance.getItemByFullName(configJobName)
+
+
+				if(configJob.builds){
+
+					if(isTheSameTime(configJob, rootRun)){
+						parametersNode = null
+						def configBuild = thisBuild
+						def configBuildNumber = configBuild.number
+						def configBuildUrl = configBuild.properties.get("envVars")["BUILD_URL"].toString()
+						def configResult = configBuild.result.toString()
+						if(configBuild.isInProgress()){
+							configResult = "in Progress"
 						}
+
+						println "After juge whether this build is in Progress" + configResult
+
+						gatherProblems(configJobName, configBuildUrl, configBuildNumber, configResult)
+						getAggregateStatus(configResult)		
+
+
+
+						def jobNode = rootNode.appendNode("job")
+						jobNode.appendNode("name",configJobName)
+						jobNode.appendNode("number", configBuildNumber)
+						jobNode.appendNode("url", configBuildUrl)
+						jobNode.appendNode("status", configResult)
+
+						addParams(configBuild, parametersNode, jobNode)
+
+
+
+
+						findSubJobs(configJob, configBuild, jobNode)
+						findSubJobs(configJob, jobNode)
 					}
-
+					/*else{
+						this.aggregateStatus = "in Progress"
+					}*/
 				}
-
-			}
-			else{
-				def parametersNode = null
-				addParams(rootRun, parametersNode, rootNode)
-
-				
-				findDownstream(rootProject, rootRun, rootNode)
-				findSubJobs(rootProject, rootRun, rootNode)
-				findSubJobs(rootRun, rootNode)
 			}
 
-			def content = XmlUtil.serialize(rootNode)
-			fp.write(content, null)
-			
-
 		}
 
-		try{
-			def entryProject = Jenkins.instance.getItem(myJobName)
-			def theBuild = entryProject.getBuildByNumber(myBuildNumber)
-			def upstreamCause = theBuild.getCause(Cause.UpstreamCause)
-			findProjectsTree(upstreamCause, entryProject, theBuild)
-			def pa = new ParametersAction([
-				new StringParameterValue("aggStatus", this.aggregateStatus)
-				])
-			build.addAction(pa)
-			build.addAction(new ParametersAction([
-				new StringParameterValue("git_ui_branch", this.git_ui_branch)
-				]))
-			build.addAction(new ParametersAction([
-				new StringParameterValue("git_backend_branch", this.git_backend_branch)
-				]))
-			build.addAction(new ParametersAction([
-				new StringParameterValue("git_qs_branch", this.git_qs_branch)
-				]))
-			build.addAction(new ParametersAction([
-				new StringParameterValue("pbJobs", this.pbJobs)
-				]))
-		}
-		catch(NullPointerException e){
-			println "************************************"
-			println e
-			println "No Such Job in Jenkins or No This build correspond thie build Number"
-			println "************************************"
+	}
+	else{
+		def parametersNode = null
+		addParams(rootRun, parametersNode, rootNode)
 
-		}
+
+		findDownstream(rootProject, rootRun, rootNode)
+		findSubJobs(rootProject, rootRun, rootNode)
+		findSubJobs(rootRun, rootNode)
+	}
+
+	def content = XmlUtil.serialize(rootNode)
+	fp.write(content, null)
+
+
+}
+
+try{
+	def entryProject = Jenkins.instance.getItem(myJobName)
+	def theBuild = entryProject.getBuildByNumber(myBuildNumber)
+	def upstreamCause = theBuild.getCause(Cause.UpstreamCause)
+	findProjectsTree(upstreamCause, entryProject, theBuild)
+	def pa = new ParametersAction([
+		new StringParameterValue("aggStatus", this.aggregateStatus)
+		])
+	build.addAction(pa)
+	build.addAction(new ParametersAction([
+		new StringParameterValue("git_ui_branch", this.git_ui_branch)
+		]))
+	build.addAction(new ParametersAction([
+		new StringParameterValue("git_backend_branch", this.git_backend_branch)
+		]))
+	build.addAction(new ParametersAction([
+		new StringParameterValue("git_qs_branch", this.git_qs_branch)
+		]))
+	build.addAction(new ParametersAction([
+		new StringParameterValue("pbJobs", this.pbJobs)
+		]))
+}
+catch(NullPointerException e){
+	println "************************************"
+	println e
+	println "No Such Job in Jenkins or No This build correspond thie build Number"
+	println "************************************"
+
+}
 
 
 
