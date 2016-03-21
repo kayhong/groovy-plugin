@@ -244,7 +244,7 @@
                           node.span[3].replaceNode({
                           new groovy.util.Node(node,
 								"span",
-								[style : "border-style: solid; border-width: 1px; background-color:gray"],
+								[style : "border-style: solid; border-width: 1px; background-color:blue"],
 								"in Progress")		
                           })
                       	
@@ -607,7 +607,7 @@
                   node.span[3].replaceNode({
                     new groovy.util.Node(null,
 								"span",
-								[style : "border-style: solid; border-width: 1px; background-color:gray"],
+								[style : "border-style: solid; border-width: 1px; background-color:blue"],
 								"in Progress")	
                   	
                   })
