@@ -42,6 +42,8 @@
 				return "red"
 				case "in Progress" : 
 				return "rgb(0,240,230)"
+				case "ABORTED" :
+				return "rgb(192,192,192)"
 				default :
 				return "orange"
 			}
@@ -245,7 +247,7 @@
                           new groovy.util.Node(node,
 								"span",
 								[style : "border-style: solid; border-width: 1px; background-color:rgb(0,240,230)"],
-								"in Progress")		
+								"in Progress/subJobb_ABORTED")		
                           })
                       	
 						
@@ -607,8 +609,8 @@
                   node.span[3].replaceNode({
                     new groovy.util.Node(null,
 								"span",
-								[style : "border-style: solid; border-width: 1px; background-color:blue"],
-								"in Progress")	
+								[style : "border-style: solid; border-width: 1px; background-color:rgb(0,240,230)"],
+								"in Progress/subjobs_ABORTED")	
                   	
                   }) 
 				}
