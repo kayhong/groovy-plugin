@@ -247,7 +247,7 @@
                           new groovy.util.Node(node,
 								"span",
 								[style : "border-style: solid; border-width: 1px; background-color:rgb(0,240,230)"],
-								"in Progress/subJobb_ABORTED")		
+								"in Progress/subJobs_ABORTED")		
                           })
                       	
 						
