@@ -121,7 +121,7 @@ def addParams(def build, def node, def jobNode){
 def gatherProblems(def name, def url, def number, def status){
 	if(this.pbJobs=="unkown"){
 		if(status!="SUCCESS"){
-			this.pbJobs = """<li><span>${name}</span>
+			this.pbJobs += """<li><span>${name}</span>
 			<span><a href='${url}' target='_blank'>${url}</a></span>
 			<span> #${number}</span>
 			<span> ${status}</span>
@@ -531,9 +531,9 @@ def findDownstream(def project, def build, def node){
 
 
 								}
-								/*else{
+								else{
 									this.aggregateStatus = "in Progress"
-								}*/
+								}
 
 							}
 						}
