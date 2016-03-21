@@ -245,9 +245,9 @@ def findSubJobs(def project, def upBuild, def node){
 										findSubJobs(configBuild, configJobNode)
 
 									}
-									/*else{
+									else{
 										this.aggregateStatus = "in Progress"
-									}*/
+									}
 
 								}
 							}
@@ -394,9 +394,9 @@ def findSubJobs(def upBuild, def node){
 										findSubJobs(configJob, configBuild, configJobNode)
 										findSubJobs(configBuild, configJobNode)
 									}
-									/*else{
+									else{
 										this.aggregateStatus = "in Progress"
-									}*/
+									}
 
 								}
 							}
@@ -696,9 +696,9 @@ def findProjectsTree(def cause, def rootProject, def theBuild){
 						findSubJobs(configJob, configBuild, jobNode)
 						findSubJobs(configJob, jobNode)
 					}
-					/*else{
+					else{
 						this.aggregateStatus = "in Progress"
-					}*/
+					}
 				}
 			}
 
