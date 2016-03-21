@@ -246,7 +246,7 @@ def findSubJobs(def project, def upBuild, def node){
 
 									}
 									else{
-										this.aggregateStatus = "in Progress"
+										this.aggregateStatus = "in Progress/Aborted"
 									}
 
 								}
@@ -295,7 +295,7 @@ def findSubJobs(def project, def upBuild, def node){
 					}
 				}
 				else{
-					this.aggregateStatus = "in Progress"
+					this.aggregateStatus = "in Progress/Aborted"
 				}
 			}
 		}
@@ -395,7 +395,7 @@ def findSubJobs(def upBuild, def node){
 										findSubJobs(configBuild, configJobNode)
 									}
 									else{
-										this.aggregateStatus = "in Progress"
+										this.aggregateStatus = "in Progress/Aborted"
 									}
 
 								}
@@ -532,7 +532,7 @@ def findDownstream(def project, def build, def node){
 
 								}
 								else{
-									this.aggregateStatus = "in Progress"
+									this.aggregateStatus = "in Progress/Aborted"
 								}
 
 							}
@@ -583,7 +583,7 @@ def findDownstream(def project, def build, def node){
 				}
 			}
 			else{
-				this.aggregateStatus = "in Progress"
+				this.aggregateStatus = "in Progress/Aborted"
 			}
 		}
 	}
@@ -697,7 +697,7 @@ def findProjectsTree(def cause, def rootProject, def theBuild){
 						findSubJobs(configJob, jobNode)
 					}
 					else{
-						this.aggregateStatus = "in Progress"
+						this.aggregateStatus = "in Progress/Aborted"
 					}
 				}
 			}
