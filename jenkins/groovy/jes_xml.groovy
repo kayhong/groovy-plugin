@@ -171,7 +171,6 @@ def findSubJobs(def project, def upBuild, def node){
 							println "After juge whether this build is in Progress" + result
 
 							gatherProblems(name, url, number, result)
-
 							getAggregateStatus(result)
 
 
@@ -233,10 +232,7 @@ def findSubJobs(def project, def upBuild, def node){
 											findSubJobs(configJob, configBuild, configJobNode)
 											findSubJobs(configBuild, configJobNode)
 
-										}
-										else{
-											this.aggregateStatus = "in Progress"
-										}
+										}										
 
 									}
 								}
@@ -282,10 +278,7 @@ def findSubJobs(def project, def upBuild, def node){
 								}
 							}
 						}
-					}
-					else{
-						this.aggregateStatus = "in Progress"
-					}
+					}					
 				}
 			}
 		}
@@ -338,10 +331,7 @@ def findSubJobs(def upBuild, def node){
 
 							addParams(buildsList.get(j), parametersNode, jobNode)
 
-
-
 							findDownstream(subProject, buildsList.get(j), jobNode)
-
 
 							def axisList = subProject.getAxes()
 
@@ -384,11 +374,7 @@ def findSubJobs(def upBuild, def node){
 
 											findSubJobs(configJob, configBuild, configJobNode)
 											findSubJobs(configBuild, configJobNode)
-										}
-										else{
-											//gatherProblems(configJobName, configBuildUrl, configBuildNumber, "in Progress/ABORTED")
-											this.aggregateStatus = "in Progress"
-										}
+										}										
 
 									}
 								}
@@ -524,10 +510,7 @@ def findDownstream(def project, def build, def node){
 										findSubJobs(configBuild, configJobNode)
 
 
-									}
-									else{
-										this.aggregateStatus = "in Progress"
-									}
+									}								
 
 								}
 							}
@@ -576,9 +559,7 @@ def findDownstream(def project, def build, def node){
 						}
 					}
 				}
-				/*else{
-				 this.aggregateStatus = "in Progress"
-				 }*/
+			
 			}
 		}
 	}
@@ -692,10 +673,7 @@ def findProjectsTree(def cause, def rootProject, def theBuild){
 
 						findSubJobs(configJob, configBuild, jobNode)
 						findSubJobs(configJob, jobNode)
-					}
-					else{
-						this.aggregateStatus = "in Progress"
-					}
+					}					
 				}
 			}
 
@@ -721,7 +699,7 @@ def findProjectsTree(def cause, def rootProject, def theBuild){
 				this.isTimeOut = "true"
 			}
 			else{
-				Thread.sleep(1000*1500)
+				Thread.sleep(1000*2000)
 				findProjectsTree(cause, rootProject, theBuild)
 			}
 
