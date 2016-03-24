@@ -706,7 +706,7 @@
 					println "***Kang is good ,"
 					println " but I have to sleep for a while for another execution for this function"
 					println "see you next time"
-					Thread.sleep(1000*20)
+					Thread.sleep(1000*1200)
 					findProjectsTree(cause, rootProject, theBuild)
 				}
 
