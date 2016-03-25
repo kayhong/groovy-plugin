@@ -68,7 +68,27 @@
 			return blnIsTheSameBuild
 		}
 
-
+		def addJobs(def node, def name, def url, def number, def result){
+			def color = getColor(result)
+			
+			node.appendNode("span", [class: "colapse", style : "border-style: solid; border-width: 1px"], name)
+			def urlSpan = node.appendNode("span", [style : "border-style: solid; border-width: 1px"])
+			urlSpan.appendNode(
+				"a",
+				[href : url, target : "_blank"],
+				url
+				)
+			node.appendNode(
+				"span",
+				[style : "border-style: solid; border-width: 1px"],
+				"#" + number
+				)
+			node.appendNode(
+				"span",
+				[style : "border-style: solid; border-width: 1px; background-color:${color}"],
+				result
+				)
+		}
 
 	//method to find triggered SubJobs
 	def findSubJobs(def project, def upBuild, def node){
@@ -82,174 +102,115 @@
 
 				for(def j = 0; j < projectsList.size(); j++){
 					def subProject = projectsList.get(j)
+					if(subProject.name!="JES"){
 
 
-					println isTheSameTime(subProject, upBuild)
-					if(isTheSameTime(subProject, upBuild)){
-						def theBuild = thisBuild
-						println theBuild
+						println isTheSameTime(subProject, upBuild)
+						if(isTheSameTime(subProject, upBuild)){
+							def theBuild = thisBuild
+							println theBuild
 
-						if(subProject instanceof MatrixProject){
-							println "is MatrixProject"
+							if(subProject instanceof MatrixProject){
+								println "is MatrixProject"
 
-							def name = subProject.name
-							def url = theBuild.properties.get("envVars")["BUILD_URL"].toString()
-							def number = theBuild.number
-							def result = theBuild.result.toString()
-							if(theBuild.isInProgress()){
-								result = "in Progress"
-							}
-							def color = getColor(result)
-
-							if(!ul)
-							ul = node.appendNode("ul", [style : "list-style-type:circle"])
-
-							def li = ul.appendNode("li")
-							li.appendNode("span", [class: "colapse", style : "border-style: solid; border-width: 1px"], name)
-							def urlSpan = li.appendNode("span", [style : "border-style: solid; border-width: 1px"])
-							urlSpan.appendNode(
-								"a",
-								[href : url, target : "_blank"],
-								url
-								)
-							li.appendNode(
-								"span",
-								[style : "border-style: solid; border-width: 1px"],
-								"#" + number
-								)
-							li.appendNode(
-								"span",
-								[style : "border-style: solid; border-width: 1px; background-color:${color}"],
-								result
-								)
-
-							findDownstream(subProject, theBuild, li)
-
-							def axisList = subProject.getAxes()
-							def configRootTag = null
-							for(def k = 0; k < axisList.size(); k++){
-								def axis = axisList.get(k)
-								def axisName = axis.getName()
-								for(def l = 0; l < axis.size(); l++){
-									def value = axis.value(l)
-									def configJobName = "${name}/${axisName}=${value}"
-									def configJob = Jenkins.instance.getItemByFullName(configJobName)
+								def name = subProject.name
+								def url = theBuild.properties.get("envVars")["BUILD_URL"].toString()
+								def number = theBuild.number
+								def result = theBuild.result.toString()
+								if(theBuild.isInProgress()){
+									result = "in Progress"
+								}				
 
 
-									println configJob
-									println isTheSameTime(configJob, theBuild)
-									println theBuild
-									if(configJob.builds){
+								if(!ul){
+									ul = node.appendNode("ul", [style : "list-style-type:circle"])
+								}
 
-										if(isTheSameTime(configJob, theBuild)){
-											def configBuild = thisBuild
-											def configBuildNumber = configBuild.number
-											def configBuildUrl = configBuild.properties.get("envVars")["BUILD_URL"].toString()
-											def configResult = configBuild.result.toString()
-											if(configBuild.isInProgress()){
-												configResult = "in Progress"
+								def li = ul.appendNode("li")
+
+								addJobs(li, name, url, number, result)
+
+								
+
+								findDownstream(subProject, theBuild, li)
+
+								def axisList = subProject.getAxes()
+								def configRootTag = null
+								for(def k = 0; k < axisList.size(); k++){
+									def axis = axisList.get(k)
+									def axisName = axis.getName()
+									for(def l = 0; l < axis.size(); l++){
+										def value = axis.value(l)
+										def configJobName = "${name}/${axisName}=${value}"
+										def configJob = Jenkins.instance.getItemByFullName(configJobName)
+
+
+										println configJob
+										println isTheSameTime(configJob, theBuild)
+										println theBuild
+										if(configJob.builds){
+
+											if(isTheSameTime(configJob, theBuild)){
+												def configBuild = thisBuild
+												def configBuildNumber = configBuild.number
+												def configBuildUrl = configBuild.properties.get("envVars")["BUILD_URL"].toString()
+												def configResult = configBuild.result.toString()
+												if(configBuild.isInProgress()){
+													configResult = "in Progress"
+												}
+												
+
+												if(!configRootTag)
+												configRootTag = li.appendNode("ul", [style : "list-style-type:circle"])
+
+												li = configRootTag.appendNode("li")
+												addJobs(li, configJobName, configBuildUrl, configBuildNumber, configResult)
+
+
+												findSubJobs(configJob, configBuild, li)
+												findSubJobs(configBuild, li)
+
 											}
-											color = getColor(configResult)
-
-											if(!configRootTag)
-											configRootTag = li.appendNode("ul", [style : "list-style-type:circle"])
-
-											li = configRootTag.appendNode("li")
-											li.appendNode("span", [class: "colapse", style : "border-style: solid; border-width: 1px"], configJobName)
-											urlSpan = li.appendNode("span", [style : "border-style: solid; border-width: 1px"])
-											urlSpan.appendNode(
-												"a",
-												[href : configBuildUrl, target : "_blank"],
-												configBuildUrl
-												)
-											li.appendNode(
-												"span",
-												[style : "border-style: solid; border-width: 1px"],
-												"#" + configBuildNumber
-												)
-											li.appendNode(
-												"span",
-												[style : "border-style: solid; border-width: 1px; background-color:${color}"],
-												configResult
-												)
-
-
-											findSubJobs(configJob, configBuild, li)
-											findSubJobs(configBuild, li)
 
 										}
-
 									}
+
 								}
 
 							}
-
-						}
-						else{
-							if(subProject.builds){
-								println isTheSameTime(subProject, upBuild)
-								if(isTheSameTime(subProject, upBuild)){
-									println "is a normal Project"
+							else{
+								if(subProject.builds){
+									println isTheSameTime(subProject, upBuild)
+									if(isTheSameTime(subProject, upBuild)){
+										println "is a normal Project"
 
 
-									theBuild = thisBuild
+										theBuild = thisBuild
 
-									def name = subProject.name
-									def url = theBuild.properties.get("envVars")["BUILD_URL"].toString()
-									def number = theBuild.number
-									def result = theBuild.result.toString()
-									if(theBuild.isInProgress()){
-										result = "in Progress"
+										def name = subProject.name
+										def url = theBuild.properties.get("envVars")["BUILD_URL"].toString()
+										def number = theBuild.number
+										def result = theBuild.result.toString()
+										if(theBuild.isInProgress()){
+											result = "in Progress"
+										}
+										
+
+										if(!ul){
+											ul = node.appendNode("ul", [style : "list-style-type:circle"])
+										}
+										def li = ul.appendNode("li")
+										addJobs(li, name, url, number, result)
+
+										
+
+										findSubJobs(subProject, theBuild, li)
+										findSubJobs(theBuild, li)
+										findDownstream(subProject, theBuild, li)
 									}
-									def color = getColor(result)
-
-									if(!ul)
-									ul = node.appendNode("ul", [style : "list-style-type:circle"])
-
-									def li = ul.appendNode("li")
-
-									li.appendNode(
-										"span",
-										[class: "colapse", style : "border-style: solid; border-width: 1px"],
-										name
-										)
-									def urlSpan = li.appendNode(
-										"span",
-										[style : "border-style: solid; border-width: 1px"]
-										)
-									urlSpan.appendNode(
-										"a",
-										[href : url, target : "_blank"],
-										url
-										)
-
-									li.appendNode(
-										"span",
-										[style : "border-style: solid; border-width: 1px"],
-										"#"+number
-										)
-									li.appendNode(
-										"span",
-										[style : "border-style: solid; border-width: 1px; background-color:${color}"],
-										result
-										)
-
-									findSubJobs(subProject, theBuild, li)
-									findSubJobs(theBuild, li)
-									findDownstream(subProject, theBuild, li)
 								}
 							}
 						}
-					}
-					else{
-						
-                          node.span[3].replaceNode({
-                          new groovy.util.Node(null,
-								"span",
-								[style : "border-style: solid; border-width: 1px; background-color:rgb(0,240,230)"],
-								"in Progress/subJobs_ABORTED")		
-                          })
-                      	
 						
 					}
 				}
@@ -279,144 +240,94 @@
 
 					try{
 						def subProject = buildsList.get(j).getProject()
-						println subProject
-						if(subProject instanceof MatrixProject){
-							println "is Matrix"
-							def name = subProject.name
-							def url = buildsList.get(j).properties.get("envVars")["BUILD_URL"].toString()
-							def number = buildsList.get(j).number
-							def result = buildsList.get(j).result.toString()
-							if(buildsList.get(j).isInProgress()){
-								result = "in Progress"
-							}
-							def color = getColor(result)
+						if(subProject.name!="JES"){
+							println subProject
+							if(subProject instanceof MatrixProject){
+								println "is Matrix"
+								def name = subProject.name
+								def url = buildsList.get(j).properties.get("envVars")["BUILD_URL"].toString()
+								def number = buildsList.get(j).number
+								def result = buildsList.get(j).result.toString()
+								if(buildsList.get(j).isInProgress()){
+									result = "in Progress"
+								}
+								
+								if(!ul){
+									ul = node.appendNode("ul", [style : "list-style-type:circle"])
+								}
 
-							if(!ul)
-							ul = node.appendNode("ul", [style : "list-style-type:circle"])
-
-							def li = ul.appendNode("li")
-							li.appendNode("span", [class: "colapse", style : "border-style: solid; border-width: 1px"], name)
-							def urlSpan = li.appendNode("span", [style : "border-style: solid; border-width: 1px"])
-							urlSpan.appendNode(
-								"a",
-								[href : url, target : "_blank"],
-								url
-								)
-							li.appendNode(
-								"span",
-								[style : "border-style: solid; border-width: 1px"],
-								"#" + number
-								)
-							li.appendNode(
-								"span",
-								[style : "border-style: solid; border-width: 1px; background-color:${color}"],
-								result
-								)
-
-							findDownstream(subProject, buildsList.get(j), li)
+								def li = ul.appendNode("li")
+								addJobs(li, name, url, number, result)
 
 
-							def axisList = subProject.getAxes()
-							def configRootTag = null
-							for(def k = 0; k < axisList.size(); k++){
-								def axis = axisList.get(k)
-								def axisName = axis.getName()
-								for(def l = 0; l < axis.size(); l++){
-									def value = axis.value(l)
-									println "axis value is ==========" + value
-									subProject.name
-									def configJobName = "${name}/${axisName}=${value}"
-									println "configJobName is =======" + configJobName
-									def configJob = Jenkins.instance.getItemByFullName(configJobName)
+
+								findDownstream(subProject, buildsList.get(j), li)
 
 
-									if(configJob.builds){
+								def axisList = subProject.getAxes()
+								def configRootTag = null
+								for(def k = 0; k < axisList.size(); k++){
+									def axis = axisList.get(k)
+									def axisName = axis.getName()
+									for(def l = 0; l < axis.size(); l++){
+										def value = axis.value(l)
+										println "axis value is ==========" + value
+										subProject.name
+										def configJobName = "${name}/${axisName}=${value}"
+										println "configJobName is =======" + configJobName
+										def configJob = Jenkins.instance.getItemByFullName(configJobName)
 
-										if(isTheSameTime(configJob, buildsList.get(j))){
-											def configBuild = thisBuild
-											def configBuildNumber = configBuild.number
-											def configBuildUrl = configBuild.properties.get("envVars")["BUILD_URL"].toString()
-											def configResult = configBuild.result.toString()
-											if(configBuild.isInProgress()){
-												configResult = "in Progress"
+
+										if(configJob.builds){
+
+											if(isTheSameTime(configJob, buildsList.get(j))){
+												def configBuild = thisBuild
+												def configBuildNumber = configBuild.number
+												def configBuildUrl = configBuild.properties.get("envVars")["BUILD_URL"].toString()
+												def configResult = configBuild.result.toString()
+												if(configBuild.isInProgress()){
+													configResult = "in Progress"
+												}
+												
+
+												if(!configRootTag){
+													configRootTag = li.appendNode("ul", [style : "list-style-type:circle"])
+												}
+
+												li = configRootTag.appendNode("li")
+												addJobs(li, configJobName, configBuildUrl, configBuildNumber, configResult)
+												
+												findSubJobs(configJob, configBuild, li)
+												findSubJobs(configBuild, li)
 											}
-											color = getColor(configResult)
 
-											if(!configRootTag)
-											configRootTag = li.appendNode("ul", [style : "list-style-type:circle"])
-
-											li = configRootTag.appendNode("li")
-											li.appendNode("span", [class: "colapse", style : "border-style: solid; border-width: 1px"], configJobName)
-											urlSpan = li.appendNode("span", [style : "border-style: solid; border-width: 1px"])
-											urlSpan.appendNode(
-												"a",
-												[href : configBuildUrl, target : "_blank"],
-												configBuildUrl
-												)
-											li.appendNode(
-												"span",
-												[style : "border-style: solid; border-width: 1px"],
-												"#" + configBuildNumber
-												)
-											li.appendNode(
-												"span",
-												[style : "border-style: solid; border-width: 1px; background-color:${color}"],
-												configResult
-												)
-
-
-											findSubJobs(configJob, configBuild, li)
-											findSubJobs(configBuild, li)
 										}
-
 									}
 								}
 							}
-						}
-						else{
-							println "is normal project"
-							def name = subProject.name
-							def url = buildsList.get(j).properties.get("envVars")["BUILD_URL"].toString()
-							def number = buildsList.get(j).number
-							def result = buildsList.get(j).result.toString()
-							if(buildsList.get(j).isInProgress()){
-								result = "in Progress"
+							else{
+								println "is normal project"
+								def name = subProject.name
+								def url = buildsList.get(j).properties.get("envVars")["BUILD_URL"].toString()
+								def number = buildsList.get(j).number
+								def result = buildsList.get(j).result.toString()
+								if(buildsList.get(j).isInProgress()){
+									result = "in Progress"
+								}
+								
+
+								if(!ul){
+									ul = node.appendNode("ul", [style : "list-style-type:circle"])
+								}
+
+								def li = ul.appendNode("li")
+								addJobs(li, name, url, number, result)
+
+
+								findSubJobs(subProject, buildsList.get(j), li)
+								findSubJobs(buildsList.get(j), li)
+								findDownstream(subProject, buildsList.get(j), li)
 							}
-							def color = getColor(result)
-
-							if(!ul)
-							ul = node.appendNode("ul", [style : "list-style-type:circle"])
-
-							def li = ul.appendNode("li")
-							li.appendNode(
-								"span",
-								[class: "colapse", style : "border-style: solid; border-width: 1px"],
-								name
-								)
-							def urlSpan = li.appendNode(
-								"span",
-								[style : "border-style: solid; border-width: 1px"]
-								)
-							urlSpan.appendNode(
-								"a",
-								[href : url, target : "_blank"],
-								url
-								)
-							li.appendNode(
-								"span",
-								[style : "border-style: solid; border-width: 1px"],
-								"#"+ number
-								)
-							li.appendNode(
-								"span",
-								[style : "border-style: solid; border-width: 1px; background-color:${color}"],
-								result
-								)
-
-
-							findSubJobs(subProject, buildsList.get(j), li)
-							findSubJobs(buildsList.get(j), li)
-							findDownstream(subProject, buildsList.get(j), li)
 						}
 					}
 					catch(NullPointerException e){
@@ -444,176 +355,116 @@
 			for(def n = 0; n < downstreamList.size(); n++){
 				println "**** this is downstream Jobs"
 				def dproject = downstreamList.get(n)
-				println dproject
-				println build
-				println isTheSameTime(dproject, build)
-				if(isTheSameTime(dproject, build)){
-					def theBuild = thisBuild
+				if(dproject.name!="JES"){
+					println dproject
+					println build
+					println isTheSameTime(dproject, build)
+					if(isTheSameTime(dproject, build)){
+						def theBuild = thisBuild
 
-					if(dproject instanceof MatrixProject){
-						println "is  Matrix"
+						if(dproject instanceof MatrixProject){
+							println "is  Matrix"
 
-						def name = dproject.name
-						def url = theBuild.properties.get("envVars")["BUILD_URL"].toString()
-						def number = theBuild.number
-						def result = theBuild.result.toString()
-						if(theBuild.isInProgress()){
-							result = "in Progress"
-						}
-						def color = getColor(result)
+							def name = dproject.name
+							def url = theBuild.properties.get("envVars")["BUILD_URL"].toString()
+							def number = theBuild.number
+							def result = theBuild.result.toString()
+							if(theBuild.isInProgress()){
+								result = "in Progress"
+							}
+							
 
-						if(!ul)
-						ul = node.appendNode("ul", [style : "list-style-type:circle"])
+							if(!ul){
+								ul = node.appendNode("ul", [style : "list-style-type:circle"])
+							}
 
-						def li = ul.appendNode("li")
-						li.appendNode("span", [class: "colapse", style : "border-style: solid; border-width: 1px"], name)
-						def urlSpan = li.appendNode("span", [style : "border-style: solid; border-width: 1px"])
-						urlSpan.appendNode(
-							"a",
-							[href : url, target : "_blank"],
-							url
-							)
-						li.appendNode(
-							"span",
-							[style : "border-style: solid; border-width: 1px"],
-							"#" + number
-							)
-						li.appendNode(
-							"span",
-							[style : "border-style: solid; border-width: 1px; background-color:${color}"],
-							result
-							)
+							def li = ul.appendNode("li")
+							addJobs(li, name, url, number, result)
 
-						findDownstream(dproject, theBuild, li)
-						def axisList = dproject.getAxes()
-						def configRootTag = null
-						for(def i = 0; i < axisList.size(); i++){
-							def axis = axisList.get(i)
-							def axisName = axis.getName()
-							for(def j = 0; j < axis.size(); j++){
-								print "This is the ${j} axis value"
-								dproject.getFullName()
-								def value = axis.value(j)
-								println "axis value is ==========" + value
-								def configJobName = "${name}/${axisName}=${value}"
-								println "configJobName is =======" + configJobName
-								def configJob = Jenkins.instance.getItemByFullName(configJobName)
+							findDownstream(dproject, theBuild, li)
+							def axisList = dproject.getAxes()
+							def configRootTag = null
+							for(def i = 0; i < axisList.size(); i++){
+								def axis = axisList.get(i)
+								def axisName = axis.getName()
+								for(def j = 0; j < axis.size(); j++){
+									print "This is the ${j} axis value"
+									dproject.getFullName()
+									def value = axis.value(j)
+									println "axis value is ==========" + value
+									def configJobName = "${name}/${axisName}=${value}"
+									println "configJobName is =======" + configJobName
+									def configJob = Jenkins.instance.getItemByFullName(configJobName)
 
 
 
 
-								if(configJob.builds){
+									if(configJob.builds){
 
-									if(isTheSameTime(configJob, theBuild)){
-										def configBuild = thisBuild
-										println configBuild
-										def configBuildNumber = configBuild.number
-										def configBuildUrl = configBuild.properties.get("envVars")["BUILD_URL"].toString()
-										def configResult = configBuild.result.toString()
-										if(configBuild.isInProgress()){
-											configResult = "in Progress"
+										if(isTheSameTime(configJob, theBuild)){
+											def configBuild = thisBuild
+											println configBuild
+											def configBuildNumber = configBuild.number
+											def configBuildUrl = configBuild.properties.get("envVars")["BUILD_URL"].toString()
+											def configResult = configBuild.result.toString()
+											if(configBuild.isInProgress()){
+												configResult = "in Progress"
+											}
+											
+
+											if(!configRootTag){
+												configRootTag = li.appendNode("ul", [style : "list-style-type:circle"])
+											}
+
+											li = configRootTag.appendNode("li")
+											addJobs(li, configJobName, configBuildUrl, configBuildNumber, configResult)
+
+
+											findSubJobs(configJob, configBuild, li)
+											findSubJobs(configBuild, li)
+
+
+
 										}
-										color = getColor(configResult)
-
-										if(!configRootTag)
-										configRootTag = li.appendNode("ul", [style : "list-style-type:circle"])
-
-										li = configRootTag.appendNode("li")
-										li.appendNode("span", [class: "colapse", style : "border-style: solid; border-width: 1px"], 
-											configJobName)
-										urlSpan = li.appendNode("span", [style : "border-style: solid; border-width: 1px"])
-										urlSpan.appendNode(
-											"a",
-											[href : configBuildUrl, target : "_blank"],
-											configBuildUrl
-											)
-										li.appendNode(
-											"span",
-											[style : "border-style: solid; border-width: 1px"],
-											"#" + configBuildNumber
-											)
-										li.appendNode(
-											"span",
-											[style : "border-style: solid; border-width: 1px; background-color:${color}"],
-											configResult
-											)
-
-
-										findSubJobs(configJob, configBuild, li)
-										findSubJobs(configBuild, li)
-
-
 
 									}
-
 								}
+
 							}
 
 						}
+						else{
 
-					}
-					else{
+							if(dproject.builds){
+								println "is normal project"
 
-						if(dproject.builds){
-							println "is normal project"
+								if(isTheSameTime(dproject, build)){
+									theBuild = thisBuild
+									def name = dproject.name
+									def url = theBuild.properties.get("envVars")["BUILD_URL"].toString()
+									def number = theBuild.number
+									def result = theBuild.result.toString()
+									if(theBuild.isInProgress()){
+										result = "in Progress"
+									}
+									
 
-							if(isTheSameTime(dproject, build)){
-								theBuild = thisBuild
-								def name = dproject.name
-								def url = theBuild.properties.get("envVars")["BUILD_URL"].toString()
-								def number = theBuild.number
-								def result = theBuild.result.toString()
-								if(theBuild.isInProgress()){
-									result = "in Progress"
+									if(!ul){
+										ul = node.appendNode("ul", [style : "list-style-type:circle"])
+									}
+
+									def li = ul.appendNode("li")
+									addJobs(li, name, url, number, result)
+
+
+									findSubJobs(dproject, theBuild, li)
+									findSubJobs(theBuild, li)
+									findDownstream(dproject, theBuild, li)
 								}
-								def color = getColor(result)
-
-								if(!ul)
-								ul = node.appendNode("ul", [style : "list-style-type:circle"])
-
-								def li = ul.appendNode("li")
-								li.appendNode(
-									"span",
-									[class: "colapse", style : "border-style: solid; border-width: 1px"],
-									name
-									)
-								def urlSpan = li.appendNode(
-									"span",
-									[style : "border-style: solid; border-width: 1px"]
-									)
-								urlSpan.appendNode(
-									"a",
-									[href : url, target : "_blank"],
-									url
-									)
-								li.appendNode(
-									"span",
-									[style : "border-style: solid; border-width: 1px"],
-									"#"+number
-									)
-								li.appendNode(
-									"span",
-									[style : "border-style: solid; border-width: 1px; background-color:${color}"],
-									result
-									)
-
-								findSubJobs(dproject, theBuild, li)
-								findSubJobs(theBuild, li)
-								findDownstream(dproject, theBuild, li)
 							}
 						}
 					}
-				}
-				else{
-							
-                  node.span[3].replaceNode({
-                    new groovy.util.Node(null,
-								"span",
-								[style : "border-style: solid; border-width: 1px; background-color:rgb(0,240,230)"],
-								"in Progress/subjobs_ABORTED")	
-                  	
-                  }) 
-				}
+				}	
 			}
 		}
 		catch(NullPointerException e){
@@ -748,29 +599,13 @@
 							if(configBuild.isInProgress()){
 								configResult = "in Progress"
 							}
-							color = getColor(configResult)
-							if(!ul)
-							ul = node.appendNode("ul", [style : "list-style-type:circle"])
+							
+							if(!ul){
+								ul = node.appendNode("ul", [style : "list-style-type:circle"])
+							}
 
 							li = ul.appendNode("li")
-							li.appendNode("span", [class : "colapse", style : "border-style: solid; border-width: 1px"], configJobName)
-							def urlSpan = li.appendNode("span", [style : "border-style: solid; border-width: 1px"])
-							urlSpan.appendNode(
-								"a",
-								[href : configBuildUrl, target : "_blank"],
-								configBuildUrl
-								)
-							li.appendNode(
-								"span",
-								[style : "border-style: solid; border-width: 1px"],
-								"#" + configBuildNumber
-								)
-							li.appendNode(
-								"span",
-								[style : "border-style: solid; border-width: 1px; background-color:${color}"],
-								configResult
-								)
-
+							addJobs(li, configJobName, configBuildUrl, configBuildNumber, configResult)
 
 							findSubJobs(configJob, configBuild, li)
 							findSubJobs(configJob, li)

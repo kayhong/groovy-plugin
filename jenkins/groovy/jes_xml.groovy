@@ -70,16 +70,20 @@
 	}
 
 	def getAggregateStatus(def result){
-
-		if(result=="in Progress"){
+		if(this.aggregateStatus==""){
 			this.aggregateStatus = result
 		}
+		else{
+			if(result=="in Progress"){
+				this.aggregateStatus = result
+			}
 
-		if(result=="FAILURE"&&this.aggregateStatus!="in Progress"){
-			this.aggregateStatus = result
-		}
-		if(result=="UNSTABLE"&&this.aggregateStatus=="SUCCESS"){
-			this.aggregateStatus = result
+			if(result=="FAILURE"&&this.aggregateStatus!="in Progress"){
+				this.aggregateStatus = result
+			}
+			if(result=="UNSTABLE"&&this.aggregateStatus=="SUCCESS"){
+				this.aggregateStatus = result
+			}
 		}
 		println "The current Aggregate Status is +++ " + this.aggregateStatus
 	}
@@ -88,14 +92,14 @@
 
 		switch(paramName) {
 			case "git.backend.branch":
-				this.git_backend_branch = paramValue
-				break
+			this.git_backend_branch = paramValue
+			break
 			case "git.ui.branch":
-				this.git_ui_branch = paramValue
-				break
+			this.git_ui_branch = paramValue
+			break
 			case "git.qs.branch":
-				this.git_qs_branch = paramValue
-				break
+			this.git_qs_branch = paramValue
+			break
 		}
 	}
 
@@ -118,14 +122,22 @@
 		}
 	}
 
+	def addJobs(def node, def name, def url, def number, def result){
+		node.appendNode("name", name)
+		node.appendNode("number", number)
+		node.appendNode("url", url)
+		node.appendNode("status", result)
+
+	}
+
 	def gatherProblems(def name, def url, def number, def status){
 
 		if(status!="SUCCESS"&&!this.pbJobs.contains(url)){
 			this.pbJobs += """<li><span>${name}</span>
-				<span><a href='${url}' target='_blank'>${url}</a></span>
-				<span> #${number}</span>
-				<span> ${status}</span>
-				</li>"""
+			<span><a href='${url}' target='_blank'>${url}</a></span>
+			<span> #${number}</span>
+			<span> ${status}</span>
+			</li>"""
 		}
 	}
 
@@ -151,7 +163,6 @@
 					def subProject = projectsList.get(j)
 					if(subProject.name!="JES"){
 
-
 						println isTheSameTime(subProject, upBuild)
 						if(isTheSameTime(subProject, upBuild)){
 							def theBuild = thisBuild
@@ -175,14 +186,8 @@
 
 
 								def jobNode = node.appendNode("job")
-								jobNode.appendNode("name", name)
-								jobNode.appendNode("number", number)
-								jobNode.appendNode("url", url)
-								jobNode.appendNode("status", result)
-
+								addJobs(jobNode, name, url, number, result)
 								addParams(theBuild, parametersNode, jobNode)
-
-
 
 								findDownstream(subProject, theBuild, jobNode)
 
@@ -195,7 +200,6 @@
 										def value = axis.value(l)
 										def configJobName = "${name}/${axisName}=${value}"
 										def configJob = Jenkins.instance.getItemByFullName(configJobName)
-
 
 										println configJob
 										println isTheSameTime(configJob, theBuild)
@@ -215,40 +219,23 @@
 
 												gatherProblems(configJobName, configBuildUrl, configBuildNumber, configResult)
 												getAggregateStatus(configResult)
-
-
 												parametersNode = null
-
 												def configJobNode = jobNode.appendNode("job")
-												configJobNode.appendNode("name", configJobName)
-												configJobNode.appendNode("number", configBuildNumber)
-												configJobNode.appendNode("url", configBuildUrl)
-												configJobNode.appendNode("status", configResult)
-
+												addJobs(configJobNode, configJobName, configBuildUrl, configBuildUrl, configResult)
 												addParams(configBuild, parametersNode, configJobNode)
-
-
-
 												findSubJobs(configJob, configBuild, configJobNode)
 												findSubJobs(configBuild, configJobNode)
-
-											}										
-
+											}
 										}
 									}
-
 								}
-
 							}
 							else{
 								if(subProject.builds){
 									println isTheSameTime(subProject, upBuild)
 									if(isTheSameTime(subProject, upBuild)){
 										println "is a normal Project"
-
-
 										theBuild = thisBuild
-
 										def name = subProject.name
 										def url = theBuild.properties.get("envVars")["BUILD_URL"].toString()
 										def number = theBuild.number
@@ -261,16 +248,9 @@
 										gatherProblems(name, url, number, result)
 										getAggregateStatus(result)
 
-
 										def jobNode = node.appendNode("job")
-										jobNode.appendNode("name", name)
-										jobNode.appendNode("number", number)
-										jobNode.appendNode("url", url)
-										jobNode.appendNode("status", result)
-
+										addJobs(jobNode, name, url, number, result)
 										addParams(theBuild, parametersNode, jobNode)
-
-
 
 										findSubJobs(subProject, theBuild, jobNode)
 										findSubJobs(theBuild, jobNode)
@@ -278,12 +258,11 @@
 									}
 								}
 							}
-						}					
+						}									
 					}
 				}
 			}
 		}
-
 
 		catch(NullPointerException e) {
 			println e
@@ -324,11 +303,7 @@
 								getAggregateStatus(result)
 
 								def jobNode = node.appendNode("job")
-								jobNode.appendNode("name", name)
-								jobNode.appendNode("number", number)
-								jobNode.appendNode("url", url)
-								jobNode.appendNode("status", result)
-
+								addJobs(jobNode, name, url, number, result)
 								addParams(buildsList.get(j), parametersNode, jobNode)
 
 								findDownstream(subProject, buildsList.get(j), jobNode)
@@ -363,14 +338,9 @@
 
 
 												def configJobNode = jobNode.appendNode("job")
-												configJobNode.appendNode("name", configJobName)
-												configJobNode.appendNode("number", configBuildNumber)
-												configJobNode.appendNode("url", configBuildUrl)
-												configJobNode.appendNode("status", configResult)
-
+												addJobs(configJobNode, configJobName, configBuildUrl,configBuildNumber, configResult)
 
 												addParams(configBuild, parametersNode, configJobNode)
-
 
 												findSubJobs(configJob, configBuild, configJobNode)
 												findSubJobs(configBuild, configJobNode)
@@ -396,11 +366,7 @@
 
 
 								def jobNode = node.appendNode("job")
-								jobNode.appendNode("name", name)
-								jobNode.appendNode("number", number)
-								jobNode.appendNode("url", url)
-								jobNode.appendNode("status", result)
-
+								addJobs(jobNode, name, url, number, result)
 								addParams(buildsList.get(j), parametersNode, jobNode)
 
 
@@ -460,11 +426,7 @@
 
 
 							def jobNode = node.appendNode("job")
-							jobNode.appendNode("name", name)
-							jobNode.appendNode("number", number)
-							jobNode.appendNode("url", url)
-							jobNode.appendNode("status", result)
-
+							addJobs(jobNode, name, url, number, result)
 							addParams(theBuild, parametersNode, jobNode)
 
 
@@ -497,34 +459,20 @@
 
 
 											def configJobNode = jobNode.appendNode("job")
-											configJobNode.appendNode("name", configJobName)
-											configJobNode.appendNode("number", configBuildNumber)
-											configJobNode.appendNode("url", configBuildUrl)
-											configJobNode.appendNode("status", configResult)
-
+											addJobs(configJobNode, configJobName, configBuildUrl, configBuildNumber, configResult)
 											addParams(configBuild, parametersNode, configJobNode)
-
-
 
 											findSubJobs(configJob, configBuild, configJobNode)
 											findSubJobs(configBuild, configJobNode)
-
-
-										}								
-
+										}
 									}
 								}
-
 							}
-
 						}
 						else{
-
 							if(dproject.builds){
 								println "is normal project"
-
 								if(isTheSameTime(dproject, build)){
-
 									theBuild = thisBuild
 									def name = dproject.name
 									def url = theBuild.properties.get("envVars")["BUILD_URL"].toString()
@@ -538,19 +486,9 @@
 									gatherProblems(name, url, number, result)
 									getAggregateStatus(result)
 
-
-
-
 									def jobNode = node.appendNode("job")
-									jobNode.appendNode("name", name)
-									jobNode.appendNode("number", number)
-									jobNode.appendNode("url", url)
-									jobNode.appendNode("status", result)
-
+									addJobs(jobNode, name, url, number, result)
 									addParams(theBuild, parametersNode, jobNode)
-
-
-
 
 									findSubJobs(dproject, theBuild, jobNode)
 									findSubJobs(theBuild, jobNode)
@@ -559,7 +497,6 @@
 							}
 						}
 					}
-				
 				}
 			}
 		}
@@ -567,8 +504,6 @@
 			println e
 			println "*** No Project correspond the build"
 		}
-
-
 	}
 
 
@@ -606,8 +541,7 @@
 			this.aggregateStatus = ""
 			this.pbJobs = ""
 			gatherProblems(jobName, buildUrl, buildNumber, result)
-		}
-		
+		}		
 
 		getAggregateStatus(result)
 
@@ -619,14 +553,8 @@
 
 		}
 
-
-
 		fp.write(writer.toString(), null)
-
-
 		def rootNode = this.parser.parseText(writer.toString())
-
-
 
 		if(rootProject instanceof MatrixProject){
 			def parametersNode = null
@@ -663,18 +591,10 @@
 							gatherProblems(configJobName, configBuildUrl, configBuildNumber, configResult)
 							getAggregateStatus(configResult)
 
-
-
 							def jobNode = rootNode.appendNode("job")
-							jobNode.appendNode("name",configJobName)
-							jobNode.appendNode("number", configBuildNumber)
-							jobNode.appendNode("url", configBuildUrl)
-							jobNode.appendNode("status", configResult)
+							addJobs(jobNode, name, url, number, result)
 
 							addParams(configBuild, parametersNode, jobNode)
-
-
-
 
 							findSubJobs(configJob, configBuild, jobNode)
 							findSubJobs(configJob, jobNode)
