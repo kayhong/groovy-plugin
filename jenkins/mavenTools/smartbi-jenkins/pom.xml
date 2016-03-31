@@ -45,9 +45,9 @@
         <configuration>
           <transformationSets>
             <transformationSet>
-              <dir>src/main/xml</dir>
-              <stylesheet>src/main/xslt/stylesheet.xsl</stylesheet>
-              <outputDir>target/html</outputDir>
+              <dir>../../../target</dir>
+              <stylesheet>src/main/xslt/jes.xsl</stylesheet>
+              <outputDir>../../../target</outputDir>
               <fileMappers>
                 <fileMapper
                   implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">

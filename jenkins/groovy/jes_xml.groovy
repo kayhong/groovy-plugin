@@ -221,7 +221,7 @@
 												getAggregateStatus(configResult)
 												parametersNode = null
 												def configJobNode = jobNode.appendNode("job")
-												addJobs(configJobNode, configJobName, configBuildUrl, configBuildUrl, configResult)
+												addJobs(configJobNode, configJobName, configBuildUrl, configBuildNumber, configResult)
 												addParams(configBuild, parametersNode, configJobNode)
 												findSubJobs(configJob, configBuild, configJobNode)
 												findSubJobs(configBuild, configJobNode)
@@ -592,7 +592,7 @@
 							getAggregateStatus(configResult)
 
 							def jobNode = rootNode.appendNode("job")
-							addJobs(jobNode, name, url, number, result)
+							addJobs(jobNode, configJobName, configBuildUrl, configBuildNumber, configResult)
 
 							addParams(configBuild, parametersNode, jobNode)
 
