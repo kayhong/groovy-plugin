@@ -620,14 +620,14 @@
 
 		try{
 			if(this.aggregateStatus=="in Progress"){
-				if(this.iterationTimes > 5){
+				if(this.iterationTimes > 30){
 					this.isTimeOut = "true"
 				}
 				else{
 					println "***Kang is good ,"
-					println "***but I have to sleep for 1200 s for another execution for this function"
+					println "***but I have to sleep for 60 s for another execution for this function"
 					println "***see you next time"
-					Thread.sleep(1000*1200)
+					Thread.sleep(1000*60)
 					findProjectsTree(cause, rootProject, theBuild)
 				}
 
