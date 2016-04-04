@@ -537,11 +537,16 @@
 		def buildNumber = rootRun.number
 		def result = rootRun.result.toString()
 
+
+
 		if(this.iterationTimes > 1){
 			this.aggregateStatus = ""
 			this.pbJobs = ""
 			gatherProblems(jobName, buildUrl, buildNumber, result)
-		}		
+		}
+        else{
+            gatherProblems(jobName, buildUrl, buildNumber, result)
+        }		
 
 		getAggregateStatus(result)
 
