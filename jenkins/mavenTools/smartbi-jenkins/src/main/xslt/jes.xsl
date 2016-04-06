@@ -4,13 +4,13 @@
   <xsl:template match="/">
     <html>
       <head>
-        <link rel="stylesheet" type="text/css" href="../../jenkins/mavenTools/smartbi-jenkins/src/main/stylesheet/jes.css"/>
+        <link rel="stylesheet" type="text/css" href="../../xmlToHtml/src/main/stylesheet/jes.css"/>
       </head>
 
       <body>    
         <ul>
           <li>          
-           <input id="job_parent" type="checkbox"/>
+           <input id="job_parent" type="checkbox"><xsl:attribute name="checked"/></input>
            <label for="job_parent"><xsl:value-of select="job/name"/></label>
            <label><a target="_blank"><xsl:attribute name="href"><xsl:value-of select="job/url"/></xsl:attribute><xsl:value-of select="job/url"/></a></label>
            <label>#<xsl:value-of select="job/number"/></label>
@@ -40,7 +40,7 @@
           <ul>
             <xsl:if test="job/parameters">               
               <li>
-                <input id="parameters" type="checkbox"/>
+                <input id="parameters" type="checkbox"><xsl:attribute name="checked"/></input>
                 <label for="parameters" style="background-color:rgb(80,80,80)">parameters</label>                       
                 <ul>
                   <xsl:for-each select="job/parameters/parameter">
@@ -70,7 +70,7 @@
 
 <xsl:template name="subjob">  
   <li>
-    <input type="checkbox"><xsl:attribute name="id"><xsl:value-of select="generate-id(name)"/></xsl:attribute></input>
+    <input type="checkbox"><xsl:attribute name="checked"/><xsl:attribute name="id"><xsl:value-of select="generate-id(name)"/></xsl:attribute></input>
     <label><xsl:attribute name="for"><xsl:value-of select="generate-id(name)"/></xsl:attribute><xsl:value-of select="name"/></label>
     <label><a target="_blank"><xsl:attribute name="href"><xsl:value-of select="url"/></xsl:attribute><xsl:value-of select="url"/></a></label>
     <label>#<xsl:value-of select="number"/></label>
@@ -100,7 +100,7 @@
     <ul>
       <xsl:if test="parameters">         
         <li>
-         <input type="checkbox"><xsl:attribute name="id"><xsl:value-of select="generate-id(parameters)"/></xsl:attribute></input>
+         <input type="checkbox"><xsl:attribute name="checked"/><xsl:attribute name="id"><xsl:value-of select="generate-id(parameters)"/></xsl:attribute></input>
          <label style="background-color:rgb(80,80,80)"><xsl:attribute name="for"><xsl:value-of select="generate-id(parameters)"/></xsl:attribute>parameters</label>                   
          <ul>
           <xsl:for-each select="parameters/parameter">
