@@ -4,7 +4,7 @@
   <xsl:template match="/">
     <html>
       <head>
-        <link rel="stylesheet" type="text/css" href="../jenkins/mavenTools/smartbi-jenkins/src/main/stylesheet/jes.css"/>
+        <link rel="stylesheet" type="text/css" href="../../jenkins/mavenTools/smartbi-jenkins/src/main/stylesheet/jes.css"/>
       </head>
 
       <body>    
