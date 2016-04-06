@@ -37,7 +37,7 @@
 
 
 	workspace = build.workspace.toString()
-	outputFileFolder = workspace + "/target"
+	outputFileFolder = workspace + "/target/xml"
 
 	def getParameters(def build){
 		def paramAction = build.getAction(ParametersAction)
