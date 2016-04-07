@@ -19,7 +19,7 @@
 		println "        #   : " + myBuildNumber
 
 		workspace = build.workspace.toString()
-		outputFileFolder = workspace + "/target"
+		outputFileFolder = workspace + "/target/html"
 
 		def getParameters(def build){
 			def paramAction = build.getAction(ParametersAction)
@@ -489,11 +489,11 @@
 
 		if(build.workspace.isRemote()){
 			def channel = build.workspace.channel
-			fp = new FilePath(channel, outputFileFolder + "/jes.html")
+			fp = new FilePath(channel, outputFileFolder + "/jes-WithoutParam.html")
 
 		}
 		else{
-			fp = new FilePath(new File(outputFileFolder + "/jes.html"))
+			fp = new FilePath(new File(outputFileFolder + "/jes-WithoutParam.html"))
 		}
 
 		fp.write("", null)

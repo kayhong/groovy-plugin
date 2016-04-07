@@ -153,6 +153,8 @@
 	//method to find triggered SubJobs
 	def findSubJobs(def project, def upBuild, def node){
 		try {
+			println "----------------- starts to count traversing non-blocked sub-jobs time of " + project
+			def startTime = System.currentTimeMillis()
 			def actionsList = upBuild.getActions(BuildInfoExporterAction)
 			for(def i = 0; i < actionsList.size(); i++ ){
 				def projectsList = actionsList.get(i).getTriggeredProjects()
@@ -262,6 +264,9 @@
 					}
 				}
 			}
+			def endTime = System.currentTimeMillis()
+			def duration = endTime - startTime
+			println "-------------- the duration time of traversing non-blocked sub-jobs of " + project + " is " + duration + "ms"	
 		}
 
 		catch(NullPointerException e) {
@@ -277,6 +282,8 @@
 
 	def findSubJobs(def upBuild, def node){
 		try{
+			println "----------------- starts to count traversing blocked-sub jobs time of " + upBuild
+			def startTime = System.currentTimeMillis()
 			def actionsList = upBuild.getActions(BuildInfoExporterAction)
 			for(def i = 0; i < actionsList.size(); i++ ){
 				println "** these are blocked sub Jobs**"
@@ -382,7 +389,9 @@
 					}
 				}
 			}
-
+			def endTime = System.currentTimeMillis()
+			def duration = endTime - startTime
+			println "-------------- the duration time of traversing blocked-sub jobs of " + upBuild + " is " + duration + "ms"	
 		}
 
 		catch(NullPointerException e){
@@ -395,6 +404,8 @@
 	//Method to find Downstream projects
 	def findDownstream(def project, def build, def node){
 		try{
+			println "----------------- starts to count traversing Downstream time of " + project
+			def startTime = System.currentTimeMillis()
 			def downstreamList = project.getDownstreamProjects()
 
 			for(def n = 0; n < downstreamList.size(); n++){
@@ -499,7 +510,10 @@
 					}
 				}
 			}
-		}
+			def endTime = System.currentTimeMillis()
+			def duration = endTime - startTime
+			println "-------------- the duration time of traversing Downstream of " + project + " is " + duration + "ms"	
+			}
 		catch(NullPointerException e){
 			println e
 			println "*** No Project correspond the build"
