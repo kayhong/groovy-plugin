@@ -51,13 +51,15 @@
 	}
 
 	def isTheSameTime(def project, def upBuild){
-		def runMap = project.builds
+		def runList = project.builds
+		def iterator = runList.iterator()
 		boolean blnIsTheSameBuild
-		for(def o = 0; o < runMap.size(); o++){
-			def cause = runMap.get(o).getCause(Cause.UpstreamCause)
+		while(iterator.hasNext()){
+			def build = iterator.next()
+			def cause = build.getCause(Cause.UpstreamCause)
 			if(cause){
 				if(cause.getUpstreamRun().is(upBuild)){
-					thisBuild = runMap.get(o)
+					thisBuild = build
 					blnIsTheSameBuild = true
 					break
 				}
@@ -133,11 +135,20 @@
 	def gatherProblems(def name, def url, def number, def status){
 
 		if(status!="SUCCESS"&&!this.pbJobs.contains(url)){
-			this.pbJobs += """<li><span>${name}</span>
-			<span><a href='${url}' target='_blank'>${url}</a></span>
-			<span> #${number}</span>
-			<span> ${status}</span>
-			</li>"""
+			if(status=="FAILURE"){
+				this.pbJobs += """<li>
+				<span><a href='${url}' target='_blank'>${name}</a></span>
+				<span> #${number}</span>
+				<span style='font-weight:bold;color:red;'> ${status}</span>
+				</li>"""
+			}
+			if(status=="UNSTABLE"){
+				this.pbJobs += """<li>
+				<span><a href='${url}' target='_blank'>${name}</a></span>
+				<span> #${number}</span>
+				<span style='font-weight:bold;color:orange;'> ${status}</span>
+				</li>"""
+			}
 		}
 	}
 
@@ -153,16 +164,15 @@
 	//method to find triggered SubJobs
 	def findSubJobs(def project, def upBuild, def node){
 		try {
-			println "----------------- starts to count traversing non-blocked sub-jobs time of " + project
-			def startTime = System.currentTimeMillis()
 			def actionsList = upBuild.getActions(BuildInfoExporterAction)
-			for(def i = 0; i < actionsList.size(); i++ ){
-				def projectsList = actionsList.get(i).getTriggeredProjects()
+			def iterator = actionsList.iterator()
+			while(iterator.hasNext()){				
+				def projectsList = iterator.next().getTriggeredProjects()
 				println "****************** below is triggered non-blocked sub projects"
 				println projectsList
-
-				for(def j = 0; j < projectsList.size(); j++){
-					def subProject = projectsList.get(j)
+				def projectsIterator = projectsList.iterator()
+				while(projectsIterator.hasNext()){
+					def subProject = projectsIterator.next()
 					if(subProject.name!="JES"){
 
 						println isTheSameTime(subProject, upBuild)
@@ -194,12 +204,12 @@
 								findDownstream(subProject, theBuild, jobNode)
 
 								def axisList = subProject.getAxes()
-
-								for(def k = 0; k < axisList.size(); k++){
-									def axis = axisList.get(k)
+								def axisIterator = axisList.iterator()
+								while(axisIterator.hasNext()){
+									def axis = axisIterator.next()
 									def axisName = axis.getName()
-									for(def l = 0; l < axis.size(); l++){
-										def value = axis.value(l)
+									for(def i = 0; i < axis.size(); i++){
+										def value = axis.value(i)
 										def configJobName = "${name}/${axisName}=${value}"
 										def configJob = Jenkins.instance.getItemByFullName(configJobName)
 
@@ -264,9 +274,6 @@
 					}
 				}
 			}
-			def endTime = System.currentTimeMillis()
-			def duration = endTime - startTime
-			println "-------------- the duration time of traversing non-blocked sub-jobs of " + project + " is " + duration + "ms"	
 		}
 
 		catch(NullPointerException e) {
@@ -282,27 +289,26 @@
 
 	def findSubJobs(def upBuild, def node){
 		try{
-			println "----------------- starts to count traversing blocked-sub jobs time of " + upBuild
-			def startTime = System.currentTimeMillis()
 			def actionsList = upBuild.getActions(BuildInfoExporterAction)
-			for(def i = 0; i < actionsList.size(); i++ ){
+			def actionIterator = actionsList.iterator()
+			while(actionIterator.hasNext()){
 				println "** these are blocked sub Jobs**"
-				def buildsList = actionsList.get(i).getTriggeredBuilds()
-
-				for(def j = 0; j < buildsList.size(); j++){
-
+				def buildsList = actionIterator.next().getTriggeredBuilds()
+				def buildsIterator = buildsList.iterator()
+				while(buildsIterator.hasNext()){
 					try{
 						def parametersNode = null
-						def subProject = buildsList.get(j).getProject()
+						def build = buildsIterator.next()
+						def subProject = build.getProject()
 						if(subProject.name!="JES"){
 							println subProject
 							if(subProject instanceof MatrixProject){
 								println "is Matrix"
 								def name = subProject.name
-								def url = buildsList.get(j).properties.get("envVars")["BUILD_URL"].toString()
-								def number = buildsList.get(j).number
-								def result = buildsList.get(j).result.toString()
-								if(buildsList.get(j).isInProgress()){
+								def url = build.properties.get("envVars")["BUILD_URL"].toString()
+								def number = build.number
+								def result = build.result.toString()
+								if(build.isInProgress()){
 									result = "in Progress"
 								}
 								println "After juge whether this build is in Progress" + result
@@ -311,17 +317,18 @@
 
 								def jobNode = node.appendNode("job")
 								addJobs(jobNode, name, url, number, result)
-								addParams(buildsList.get(j), parametersNode, jobNode)
+								addParams(build, parametersNode, jobNode)
 
-								findDownstream(subProject, buildsList.get(j), jobNode)
+								findDownstream(subProject, build, jobNode)
 
 								def axisList = subProject.getAxes()
+								def axisIterator = axisList.iterator()
 
-								for(def k = 0; k < axisList.size(); k++){
-									def axis = axisList.get(k)
+								while(axisIterator.hasNext()){
+									def axis = axisIterator.next()
 									def axisName = axis.getName()
-									for(def l = 0; l < axis.size(); l++){
-										def value = axis.value(l)
+									for(def i = 0; i < axis.size(); i++){
+										def value = axis.value(i)
 										println "axis value is ==========" + value
 										def configJobName = "${name}/${axisName}=${value}"
 										println "configJobName is =======" + configJobName
@@ -330,7 +337,7 @@
 
 										if(configJob.builds){
 
-											if(isTheSameTime(configJob, buildsList.get(j))){
+											if(isTheSameTime(configJob, build)){
 												parametersNode = null
 												def configBuild = thisBuild
 												def configBuildNumber = configBuild.number
@@ -360,10 +367,10 @@
 							else{
 								println "is normal project"
 								def name = subProject.name
-								def url = buildsList.get(j).properties.get("envVars")["BUILD_URL"].toString()
-								def number = buildsList.get(j).number
-								def result = buildsList.get(j).result.toString()
-								if(buildsList.get(j).isInProgress()){
+								def url = build.properties.get("envVars")["BUILD_URL"].toString()
+								def number = build.number
+								def result = build.result.toString()
+								if(build.isInProgress()){
 									result = "in Progress"
 								}
 								println "After juge whether this build is in Progress" + result
@@ -374,24 +381,22 @@
 
 								def jobNode = node.appendNode("job")
 								addJobs(jobNode, name, url, number, result)
-								addParams(buildsList.get(j), parametersNode, jobNode)
+								addParams(build, parametersNode, jobNode)
 
 
-								findSubJobs(subProject, buildsList.get(j), jobNode)
-								findSubJobs(buildsList.get(j), jobNode)
-								findDownstream(subProject, buildsList.get(j), jobNode)
+								findSubJobs(subProject, build, jobNode)
+								findSubJobs(build, jobNode)
+								findDownstream(subProject, build, jobNode)
 							}
 						}
 					}
 					catch(NullPointerException e){
-						println "------------------No Project of the build" + buildsList.get(j)
+						println "------------------No Project of the build" + build
 
 					}
 				}
 			}
-			def endTime = System.currentTimeMillis()
-			def duration = endTime - startTime
-			println "-------------- the duration time of traversing blocked-sub jobs of " + upBuild + " is " + duration + "ms"	
+
 		}
 
 		catch(NullPointerException e){
@@ -404,13 +409,11 @@
 	//Method to find Downstream projects
 	def findDownstream(def project, def build, def node){
 		try{
-			println "----------------- starts to count traversing Downstream time of " + project
-			def startTime = System.currentTimeMillis()
 			def downstreamList = project.getDownstreamProjects()
-
-			for(def n = 0; n < downstreamList.size(); n++){
+			def iterator = downstreamList.iterator()
+			while(iterator.hasNext()){
 				println "**** this is downstream Jobs"
-				def dproject = downstreamList.get(n)
+				def dproject = iterator.next()
 				if(dproject.name!="JES"){
 					println dproject
 					println build
@@ -443,11 +446,12 @@
 
 							findDownstream(dproject, theBuild, jobNode)
 							def axisList = dproject.getAxes()
-							for(def i = 0; i < axisList.size(); i++){
-								def axis = axisList.get(i)
+							def axisIterator = axisList.iterator()
+							while(axisIterator.hasNext()){
+								def axis = axisIterator.next()
 								def axisName = axis.getName()
-								for(def j = 0; j < axis.size(); j++){
-									def value = axis.value(j)
+								for(def i = 0; i < axis.size(); i++){
+									def value = axis.value(i)
 									def configJobName = "${name}/${axisName}=${value}"
 									def configJob = Jenkins.instance.getItemByFullName(configJobName)
 
@@ -510,10 +514,7 @@
 					}
 				}
 			}
-			def endTime = System.currentTimeMillis()
-			def duration = endTime - startTime
-			println "-------------- the duration time of traversing Downstream of " + project + " is " + duration + "ms"	
-			}
+		}
 		catch(NullPointerException e){
 			println e
 			println "*** No Project correspond the build"
@@ -551,16 +552,11 @@
 		def buildNumber = rootRun.number
 		def result = rootRun.result.toString()
 
-
-
 		if(this.iterationTimes > 1){
 			this.aggregateStatus = ""
 			this.pbJobs = ""
 			gatherProblems(jobName, buildUrl, buildNumber, result)
-		}
-        else{
-            gatherProblems(jobName, buildUrl, buildNumber, result)
-        }		
+		}		
 
 		getAggregateStatus(result)
 
@@ -583,9 +579,9 @@
 
 			def axisList = rootProject.getAxes()
 			findDownstream(rootProject, rootRun, rootNode)
-
-			for(def i = 0; i < axisList.size(); i++){
-				def axis = axisList.get(i)
+			def axisIterator = axisList.iterator()
+			while(axisIterator.hasNext()){
+				def axis = axisIterator.next()
 				def axisName = axis.getName()
 				for(def j = 0; j < axis.size(); j++){
 					def value = axis.value(j)
