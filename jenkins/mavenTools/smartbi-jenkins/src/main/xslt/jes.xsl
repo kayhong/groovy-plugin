@@ -33,8 +33,8 @@
 
           }
           input[type=checkbox]:checked ~ ul { 
-          max-height: 100%;
-          max-width: 100%;
+          max-height: none;
+          max-width: none;
           opacity: 1;
           }
           input[type=checkbox] + label:before{
